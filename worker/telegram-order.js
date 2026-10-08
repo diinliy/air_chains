@@ -7,6 +7,7 @@
 //   ALLOWED_ORIGIN  the website address, e.g. https://diinliy.github.io
 
 const MAX_TEXT = 3500;            // Telegram allows 4096 characters per message
+const MAX_IMAGE = 3_000_000;      // base64 length of the bracelet picture (~2 MB)
 const WINDOW_MS = 10 * 60 * 1000; // simple anti-spam: at most 5 orders per IP per 10 minutes
 const MAX_PER_WINDOW = 5;
 const hits = new Map();
@@ -21,6 +22,20 @@ function tooMany(ip) {
   list.push(now);
   hits.set(ip, list);
   return list.length > MAX_PER_WINDOW;
+}
+
+// Sends the bracelet picture; returns the Telegram message id, or 0 if it could not be sent.
+async function sendPhoto(env, dataUrl, caption) {
+  const m = /^data:image\/(jpeg|png);base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl || '');
+  if (!m || m[2].length > MAX_IMAGE) return 0;
+  const bytes = Uint8Array.from(atob(m[2]), ch => ch.charCodeAt(0));
+  const form = new FormData();
+  form.append('chat_id', env.CHAT_ID);
+  form.append('caption', caption.slice(0, 1000));
+  form.append('photo', new Blob([bytes], { type: 'image/' + m[1] }), m[1] === 'png' ? 'bracelet.png' : 'bracelet.jpg');
+  const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/sendPhoto`, { method: 'POST', body: form });
+  const d = await r.json().catch(() => ({}));
+  return d.ok ? d.result.message_id : 0;
 }
 
 export default {
@@ -46,10 +61,15 @@ export default {
     if (!text) return json({ ok: false, error: 'empty' }, 400, cors);
     if (tooMany(request.headers.get('CF-Connecting-IP') || 'unknown')) return json({ ok: false, error: 'rate_limited' }, 429, cors);
 
+    // picture first, then the full order as a reply to it; the text still goes out if the picture fails
+    const summary = String(body.summary || '').slice(0, 200);
+    const photoId = await sendPhoto(env, body.image, '🛍 Нове замовлення з сайту' + (summary ? '\n' + summary : ''));
+    const message = { chat_id: env.CHAT_ID, text: (photoId ? '' : '🛍 Нове замовлення з сайту\n\n') + text, disable_web_page_preview: true };
+    if (photoId) message.reply_parameters = { message_id: photoId };
     const tg = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: env.CHAT_ID, text: '🛍 Нове замовлення з сайту\n\n' + text, disable_web_page_preview: true }),
+      body: JSON.stringify(message),
     });
     const data = await tg.json().catch(() => ({}));
     if (!data.ok) return json({ ok: false, error: 'telegram' }, 502, cors);
