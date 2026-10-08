@@ -141,13 +141,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .cta.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 @media (max-width: 900px) {
   .cfg { grid-template-columns: 1fr; }
-  /* on phones the board stays pinned while the controls scroll under it */
-  .stage { top: calc(env(safe-area-inset-top, 0px) + 57px); z-index: 5; background: var(--bg); padding-block: 8px; gap: 8px; margin-inline: calc(-1 * clamp(16px, 4vw, 40px)); padding-inline: clamp(16px, 4vw, 40px); border-bottom: 1px solid var(--line); }
-  .boardwrap { margin-inline: auto; width: min(100%, 40vh); width: min(100%, 40svh); border-radius: 18px; }
-  .statusrow, .tools { margin-inline: auto; width: 100%; justify-content: center; }
-  .sel { display: none; }
-  .tbtn { padding: 7px 10px; }
-  .tbtn .tl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .stage { position: static; }
+  .boardwrap { margin-inline: auto; }
 }
 
 /* sections */
@@ -277,8 +272,8 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       </div>
       <div class="sel" id="selinfo" aria-live="polite"></div>
       <div class="tools">
-        <button class="tbtn" id="t-left" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg><span class="tl">Перемістити ліворуч</span></button>
-        <button class="tbtn" id="t-right" type="button" disabled><span class="tl">Перемістити праворуч</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m6 3 5 5-5 5"/></svg></button>
+        <button class="tbtn" id="t-left" type="button" aria-label="Перемістити ліворуч" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg><span class="tl">Перемістити</span></button>
+        <button class="tbtn" id="t-right" type="button" aria-label="Перемістити праворуч" disabled><span class="tl">Перемістити</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m6 3 5 5-5 5"/></svg></button>
         <button class="tbtn" id="t-del" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h10M6 4V2.5h4V4M4.5 4l.7 9.5h5.6l.7-9.5"/></svg><span class="tl">Видалити</span></button>
         <button class="tbtn" id="t-undo" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3 2 6l3 3"/><path d="M2 6h7.5a4 4 0 0 1 0 8H6"/></svg><span class="tl">Скасувати</span></button>
         <button class="tbtn" id="t-clear" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.5"/><path d="M4.2 11.8l7.6-7.6"/></svg><span class="tl">Очистити</span></button>
