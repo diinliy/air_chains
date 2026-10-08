@@ -10,7 +10,8 @@
 // Binding (Worker → Settings → Bindings):
 //   ORDERS          a KV namespace where orders are stored (optional: without it orders only go to Telegram)
 
-const MAX_TEXT = 3500;            // Telegram allows 4096 characters per message
+const MAX_TEXT = 30000;           // a whole cart; longer orders are cut here
+const PART = 3900;                // Telegram allows 4096 characters per message, so long orders go in parts
 const MAX_IMAGE = 3_000_000;      // base64 length of the bracelet picture (~2 MB)
 const WINDOW_MS = 10 * 60 * 1000; // simple anti-spam: at most 5 orders per IP per 10 minutes
 const MAX_PER_WINDOW = 5;
@@ -44,6 +45,27 @@ function isAdmin(request, env) {
 }
 
 const clip = (v, n) => String(v ?? '').trim().slice(0, n);
+
+// Splits an order into Telegram-sized messages, preferring the blank lines between bracelets.
+function splitText(text, limit = PART) {
+  const parts = [];
+  let cur = '';
+  const push = () => { if (cur) parts.push(cur); cur = ''; };
+  for (const block of text.split('\n\n')) {
+    const joined = cur ? cur + '\n\n' + block : block;
+    if (joined.length <= limit) { cur = joined; continue; }
+    push();
+    if (block.length <= limit) { cur = block; continue; }
+    for (const line of block.split('\n')) {
+      const j = cur ? cur + '\n' + line : line;
+      if (j.length <= limit) { cur = j; continue; }
+      push();
+      for (let i = 0; i < line.length; i += limit) { cur = line.slice(i, i + limit); if (i + limit < line.length) push(); }
+    }
+  }
+  push();
+  return parts;
+}
 
 // Sends the bracelet picture; returns the Telegram message id, or 0 if it could not be sent.
 async function sendPhoto(env, dataUrl, caption) {
@@ -152,14 +174,18 @@ export default {
     // picture first, then the full order as a reply to it; the text still goes out if the picture fails
     const summary = String(body.summary || '').slice(0, 200);
     const photoId = await sendPhoto(env, body.image, '🛍 Нове замовлення з сайту' + (summary ? '\n' + summary : ''));
-    const message = { chat_id: env.CHAT_ID, text: (photoId ? '' : '🛍 Нове замовлення з сайту\n\n') + text, disable_web_page_preview: true };
-    if (photoId) message.reply_parameters = { message_id: photoId };
-    const tg = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(message),
-    });
-    const data = await tg.json().catch(() => ({}));
+    const parts = splitText((photoId ? '' : '🛍 Нове замовлення з сайту\n\n') + text);
+    let data = { ok: true };
+    for (let i = 0; i < parts.length && data.ok; i++) {
+      const message = { chat_id: env.CHAT_ID, text: (i ? `(продовження ${i + 1}/${parts.length})\n\n` : '') + parts[i], disable_web_page_preview: true };
+      if (photoId) message.reply_parameters = { message_id: photoId };
+      const tg = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(message),
+      });
+      data = await tg.json().catch(() => ({}));
+    }
 
     // keep the order for the admin page even if Telegram failed, so nothing is lost
     try { await saveOrder(env, body, text); } catch (e) { /* storage problems must not block the order */ }

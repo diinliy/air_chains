@@ -1567,7 +1567,8 @@ function cartPicture(canvas, size) {
   g.fillStyle = T.b2; g.fillRect(0, 0, canvas.width, canvas.height);
   cart.forEach((b, i) => {
     const t = document.createElement('canvas'); t.width = t.height = tile;
-    withDesign(b.design, () => drawBoard(t, tile / 2, { photo: true }));
+    // small tiles (3+ columns) skip the ruler so neighbouring bracelets stay clean
+    withDesign(b.design, () => drawBoard(t, tile / 2, cols >= 3 ? { mini: true } : { photo: true }));
     const x = (i % cols) * tile, y = Math.floor(i / cols) * tile;
     g.drawImage(t, x, y);
     if (n > 1) {
