@@ -363,7 +363,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
           <div><b>2 дні</b><span>на збирання</span></div>
         </div>
       </div>
-      <div class="hh-art"><canvas id="homeart" role="img" aria-label="Браслет із 22 бусин рожевого кварцу, 8 мм"></canvas></div>
+      <div class="hh-art"><canvas id="homeart" role="img" aria-label="Браслет із 22 бусин аметисту, 8 мм"></canvas></div>
     </section>
   <section id="process" class="wrap sec">
     <header><h2>Як це працює</h2></header>
@@ -1594,8 +1594,8 @@ $('#readyList').replaceChildren(...PRESETS.map(readyCard));
 $('#homeReady').replaceChildren(...PRESETS.slice(0, 3).map(readyCard));
 $('#homeStones').replaceChildren(...STONES.slice(0, 8).map(s => el('a', { className: 'stonelink', href: '#stones' }, [swatch(s.id, 60, 3), s.name])));
 (() => {
-  // hero picture: 22 rose quartz beads, 8 mm
-  const art = $('#homeart'), d = Math.min(window.devicePixelRatio || 1, 2), items = Array.from({ length: 22 }, (_, i) => ({ k: 's', id: 'rosequartz', v: i % 6, d: 8 }));
+  // hero picture: 22 amethyst beads, 8 mm
+  const art = $('#homeart'), d = Math.min(window.devicePixelRatio || 1, 2), items = Array.from({ length: 22 }, (_, i) => ({ k: 's', id: 'amethyst', v: i % 6, d: 8 }));
   art.width = art.height = Math.round(520 * d);
   art._redraw = () => withDesign({ items }, () => drawBoard(art, 520, { mini: true }));
   art._redraw();
