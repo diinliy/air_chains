@@ -1,4 +1,4 @@
-<title>Друза</title>
+<title>Air Chains</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap">
@@ -53,6 +53,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .nav { display: flex; gap: 22px; }
 .nav a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; }
 .nav a:hover { color: var(--ink); }
+.nav .ig { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
+.nav .ig svg { width: 18px; height: 18px; }
+@media (max-width: 520px) { .nav .ig span { display: none; } }
 @media (max-width: 760px) { .nav a:not(.keep) { display: none; } }
 
 /* hero */
@@ -70,7 +73,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .cfg { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: start; padding-block: 8px 56px; }
 .stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); display: grid; gap: 12px; }
 .boardwrap { position: relative; width: 100%; max-width: 620px; aspect-ratio: 1; border-radius: 22px; overflow: hidden; background: var(--board); box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px -24px rgba(0,0,0,.6); }
-#board { width: 100%; height: 100%; display: block; touch-action: manipulation; cursor: pointer; }
+#board { width: 100%; height: 100%; display: block; touch-action: manipulation; cursor: pointer; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .statusrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; max-width: 620px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--surface); border: 1px solid var(--line); }
 .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
@@ -138,8 +141,13 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .cta.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 @media (max-width: 900px) {
   .cfg { grid-template-columns: 1fr; }
-  .stage { position: static; }
-  .boardwrap { margin-inline: auto; }
+  /* on phones the board stays pinned while the controls scroll under it */
+  .stage { top: calc(env(safe-area-inset-top, 0px) + 57px); z-index: 5; background: var(--bg); padding-block: 8px; gap: 8px; margin-inline: calc(-1 * clamp(16px, 4vw, 40px)); padding-inline: clamp(16px, 4vw, 40px); border-bottom: 1px solid var(--line); }
+  .boardwrap { margin-inline: auto; width: min(100%, 40vh); width: min(100%, 40svh); border-radius: 18px; }
+  .statusrow, .tools { margin-inline: auto; width: 100%; justify-content: center; }
+  .sel { display: none; }
+  .tbtn { padding: 7px 10px; }
+  .tbtn .tl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 
 /* sections */
@@ -227,9 +235,9 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#constructor" aria-label="Друза, на початок">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 2 L17 8 L12 22 L7 8 Z"/><path d="M7 8 H17"/><path d="M4 10 L7 8 M20 10 L17 8 M4 10 L12 22 L20 10"/></svg>
-      Друза
+    <a class="logo" href="#constructor" aria-label="Air Chains, на початок">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke-dasharray="2 2.4" opacity=".5"/><circle cx="12" cy="3.5" r="2.6"/><circle cx="20.1" cy="9.4" r="2.6"/><circle cx="17" cy="18.9" r="2.6"/><circle cx="7" cy="18.9" r="2.6"/><circle cx="3.9" cy="9.4" r="2.6"/></svg>
+      Air Chains
     </a>
     <nav class="nav" aria-label="Розділи">
       <a class="keep" href="#constructor">Конструктор</a>
@@ -237,6 +245,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       <a href="#size">Розмір</a>
       <a href="#process">Як ми працюємо</a>
       <a href="#faq">Питання</a>
+      <a class="keep ig" href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" aria-label="Instagram @air_chains"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg><span>@air_chains</span></a>
     </nav>
   </div>
 </header>
@@ -244,7 +253,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 <main>
   <section class="wrap hero">
     <div>
-      <p class="label">Натуральне каміння · ручне збирання</p>
+      <p class="label">Air Chains · натуральне каміння · ручне збирання</p>
       <h1>Зберіть браслет із <em>каменів</em>, які обираєте самі</h1>
     </div>
     <div>
@@ -268,11 +277,11 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       </div>
       <div class="sel" id="selinfo" aria-live="polite"></div>
       <div class="tools">
-        <button class="tbtn" id="t-left" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg>Перемістити</button>
-        <button class="tbtn" id="t-right" type="button" disabled>Перемістити<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m6 3 5 5-5 5"/></svg></button>
-        <button class="tbtn" id="t-del" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h10M6 4V2.5h4V4M4.5 4l.7 9.5h5.6l.7-9.5"/></svg>Видалити</button>
-        <button class="tbtn" id="t-undo" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3 2 6l3 3"/><path d="M2 6h7.5a4 4 0 0 1 0 8H6"/></svg>Скасувати</button>
-        <button class="tbtn" id="t-clear" type="button">Очистити</button>
+        <button class="tbtn" id="t-left" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg><span class="tl">Перемістити ліворуч</span></button>
+        <button class="tbtn" id="t-right" type="button" disabled><span class="tl">Перемістити праворуч</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m6 3 5 5-5 5"/></svg></button>
+        <button class="tbtn" id="t-del" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h10M6 4V2.5h4V4M4.5 4l.7 9.5h5.6l.7-9.5"/></svg><span class="tl">Видалити</span></button>
+        <button class="tbtn" id="t-undo" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3 2 6l3 3"/><path d="M2 6h7.5a4 4 0 0 1 0 8H6"/></svg><span class="tl">Скасувати</span></button>
+        <button class="tbtn" id="t-clear" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.5"/><path d="M4.2 11.8l7.6-7.6"/></svg><span class="tl">Очистити</span></button>
       </div>
     </div>
 
@@ -339,7 +348,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
         <div class="field"><label for="f-note">Коментар</label><textarea id="f-note" placeholder="Наприклад: хочу місячний камінь з сильнішим сяйвом"></textarea></div>
         <p class="err" id="f-err" role="alert"></p>
         <div class="row"><button class="cta" type="submit">Сформувати замовлення</button><a class="cta ghost" href="#constructor">Повернутися до браслета</a></div>
-        <p class="note">Це демо-версія сайту. Форма не надсилає дані, а формує текст замовлення, який можна скопіювати.</p>
+        <p class="note">Форма не надсилає дані сама. Вона складає текст замовлення, який ви надсилаєте нам у Direct <a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener">@air_chains</a>.</p>
       </form>
       <div class="recap" id="recap">
         <canvas id="recapcv" aria-hidden="true"></canvas>
@@ -347,7 +356,8 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
         <div class="result" id="result" hidden>
           <p class="label">Замовлення сформовано</p>
           <textarea id="ordertext" readonly aria-label="Текст замовлення"></textarea>
-          <div class="row"><button class="cta" type="button" id="copy">Скопіювати текст</button></div>
+          <div class="row"><a class="cta" id="copy-dm" href="https://ig.me/m/air_chains" target="_blank" rel="noopener">Скопіювати і написати в Direct</a><button class="cta ghost" type="button" id="copy">Лише скопіювати</button></div>
+          <p class="note">Текст копіюється автоматично. У Direct просто вставте його і надішліть.</p>
         </div>
       </div>
     </div>
@@ -392,7 +402,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 </main>
 
 <footer>
-  <div class="wrap"><span>Друза · браслети з натурального каміння</span><span>Демо-сайт. Ціни й тексти приблизні.</span></div>
+  <div class="wrap"><span>Air Chains · браслети з натурального каміння</span><a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" style="color:inherit">Instagram @air_chains</a></div>
 </footer>
 
 <div class="mbar" aria-hidden="false">
@@ -439,7 +449,7 @@ const PRESETS = [
   { name: 'Українські камені', pattern: ['labradorite', 'crystal', 'labradorite', 'aquamarine'] },
 ];
 const BASE = 90, GIFT = 70, TOL = 2, MAX_CHARMS = 3, SPACER_W = 3;
-const KEY = 'druza-design-v1';
+const KEY = 'airchains-design-v1';
 
 const state = { wrist: 160, fit: 15, size: 8, metal: 'silver', gift: false, items: [], sel: -1 };
 let filter = 'all', infoId = 'amethyst';
@@ -463,129 +473,208 @@ const beadPrice = id => Math.round(STONE[id].price * SIZES[state.size]);
 const stoneCount = () => state.items.filter(i => i.k === 's').length;
 const clone = it => ({ ...it });
 
-/* ---------- stone textures ---------- */
+/* ---------- stone rendering ----------
+   Each bead is shaded per pixel as a polished sphere: a 3D noise texture wrapped
+   around the sphere (so veins and bands curve with the surface), a studio softbox
+   reflection, Fresnel rim, and light passing through translucent stones. */
 const sprites = new Map();
 function stoneSprite(id, v) {
   const k = id + ':' + v;
   if (!sprites.has(k)) sprites.set(k, paintStone(STONE[id], v));
   return sprites.get(k);
 }
+const PERM = (() => { const r = mulberry(1337), a = [...Array(256).keys()]; for (let i = 255; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } const p = new Uint8Array(512); for (let i = 0; i < 512; i++) p[i] = a[i & 255]; return p; })();
+const VAL = (() => { const r = mulberry(4242), v = new Float32Array(256); for (let i = 0; i < 256; i++) v[i] = r(); return v; })();
+const hv = (x, y, z) => VAL[PERM[PERM[PERM[x] + y] + z]];
+function vnoise(x, y, z) {
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  const xf = x - xi, yf = y - yi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf), w = zf * zf * (3 - 2 * zf);
+  const X = xi & 255, Y = yi & 255, Z = zi & 255, X1 = X + 1, Y1 = Y + 1, Z1 = Z + 1;
+  const a = hv(X, Y, Z) + (hv(X1, Y, Z) - hv(X, Y, Z)) * u, b = hv(X, Y1, Z) + (hv(X1, Y1, Z) - hv(X, Y1, Z)) * u;
+  const c = hv(X, Y, Z1) + (hv(X1, Y, Z1) - hv(X, Y, Z1)) * u, d = hv(X, Y1, Z1) + (hv(X1, Y1, Z1) - hv(X, Y1, Z1)) * u;
+  const e = a + (b - a) * v, f = c + (d - c) * v;
+  return e + (f - e) * w;
+}
+const clamp01 = x => x < 0 ? 0 : x > 1 ? 1 : x;
+const smooth = (e0, e1, x) => { const t = clamp01((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
+// fractal noise, stretched to use roughly the full 0..1 range
+function fbm(x, y, z, oct = 5) {
+  let s = 0, a = 0.5, n = 0;
+  for (let i = 0; i < oct; i++) { s += a * vnoise(x, y, z); n += a; x = x * 2.03 + 17.1; y = y * 2.03 + 3.7; z = z * 2.03 + 9.2; a *= 0.5; }
+  return clamp01((s / n - 0.5) * 1.9 + 0.5);
+}
+const hexRgb = h => { const n = parseInt(h.slice(1), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; };
+const C = {};
+['#4A1D72', '#8E4FC0', '#DCC6F0', '#F7D6DC', '#E39AAB', '#FFF2F4', '#EFECE4', '#CEC7BA', '#7FB6FF', '#3A4247', '#737B80', '#2F8BFF', '#2FD6B0', '#E6C34A',
+ '#3D220A', '#9A5C1B', '#E2A948', '#FFD98A', '#0C0C0E', '#16307F', '#3159C6', '#B8C4DD', '#E3C264', '#D8F0F2', '#7FC0CD', '#2A5A35', '#62A05F', '#173A22',
+ '#0F1A12', '#2F8F80', '#86D6C6', '#EEFAF6', '#F6A86E', '#B5360B', '#9AA3AB', '#E89CA5', '#C2667A', '#1D1416', '#5FD29A', '#1F9A60', '#0B4A2C', '#F7F5F0',
+ '#DCD8CF', '#55524D', '#EEF3F7', '#B88DDB', '#6B3399', '#E8A9B6', '#2E3539', '#5E676C', '#5A330F', '#D9A040', '#3FA9C9', '#7A4A16'].forEach(h => { C[h] = hexRgb(h); });
+const mixc = (a, b, t, o) => { o[0] = a[0] + (b[0] - a[0]) * t; o[1] = a[1] + (b[1] - a[1]) * t; o[2] = a[2] + (b[2] - a[2]) * t; return o; };
+const mixInto = (o, b, t) => { o[0] += (b[0] - o[0]) * t; o[1] += (b[1] - o[1]) * t; o[2] += (b[2] - o[2]) * t; };
+const WHITE = [1, 1, 1];
+
+// p = point on the sphere surface, q = point inside it (for depth in translucent stones),
+// k = per-bead constants, o = output colour; o[3] scales the specular highlight
+const MATERIALS = {
+  amethyst: { trans: 0.5, gloss: 120, spec: 0.8, fn(p, q, k, o) {
+    const w = fbm(p[0] * 2.2 + k.ox, p[1] * 2.2, p[2] * 2.2 + k.oz, 4);
+    const band = 0.5 + 0.5 * Math.sin((p[1] * 2.4 + w * 2.2) * 3.2);
+    const t = smooth(0.05, 1, band * 0.35 + fbm(q[0] * 2.6 + k.ox, q[1] * 2.6, q[2] * 2.6, 4) * 0.7);
+    mixc(C['#B88DDB'], C['#4A1D72'], t, o); mixInto(o, C['#6B3399'], 0.3);
+    mixInto(o, WHITE, 0.18 * smooth(0.6, 0.9, fbm(q[0] * 3.5 + 5, q[1] * 3.5, q[2] * 3.5 + k.oz, 4)));
+  } },
+  rosequartz: { trans: 0.5, gloss: 110, spec: 0.7, fn(p, q, k, o) {
+    mixc(C['#F7D6DC'], C['#E8A9B6'], 0.25 + 0.6 * fbm(q[0] * 2.2 + k.ox, q[1] * 2.2, q[2] * 2.2 + k.oz, 4), o);
+    mixInto(o, C['#FFF2F4'], 0.3 * smooth(0.5, 0.85, fbm(p[0] * 3.4 + 3, p[1] * 3.4, p[2] * 3.4 + k.ox, 4)));
+  } },
+  crystal: { clear: true, gloss: 160, spec: 1, fn(p, q, k, o) {
+    o[0] = C['#EEF3F7'][0]; o[1] = C['#EEF3F7'][1]; o[2] = C['#EEF3F7'][2];
+    o[4] = 0.55 * smooth(0.55, 0.88, fbm(q[0] * 2.4 + k.ox, q[1] * 2.4, q[2] * 2.4 + k.oz, 5));
+  } },
+  moonstone: { trans: 0.6, gloss: 110, spec: 0.85, fn(p, q, k, o, N) {
+    mixc(C['#F7F5F0'], C['#CEC7BA'], fbm(q[0] * 2 + k.ox, q[1] * 2, q[2] * 2 + k.oz, 4), o);
+    const facing = Math.max(0, N[0] * k.sx + N[1] * k.sy + N[2] * k.sz);
+    const s = smooth(0.3, 0.75, fbm(q[0] * 1.5 + 9, q[1] * 1.5, q[2] * 1.5 + k.ox, 4)) * facing * facing * facing;
+    o[0] += C['#7FB6FF'][0] * s * 0.55 - s * 0.25; o[1] += C['#7FB6FF'][1] * s * 0.55 - s * 0.12; o[2] += C['#7FB6FF'][2] * s * 0.6;
+  } },
+  labradorite: { trans: 0.08, gloss: 100, spec: 0.85, fn(p, q, k, o, N) {
+    mixc(C['#2E3539'], C['#5E676C'], fbm(p[0] * 3 + k.ox, p[1] * 3, p[2] * 3 + k.oz, 4), o);
+    const lam = Math.abs(Math.sin((p[0] * 0.8 + p[1] * 0.6) * 34 + fbm(p[0] * 3, p[1] * 3, p[2] * 3, 3) * 6));
+    const dim = 0.82 + 0.18 * smooth(0, 0.35, lam); o[0] *= dim; o[1] *= dim; o[2] *= dim;
+    const wx = fbm(p[0] * 1.2 + 4, p[1] * 1.2, p[2] * 1.2, 3);
+    const patch = smooth(0.58, 0.85, fbm(p[0] * 1.3 + wx * 1.5 + k.oz, p[1] * 1.3 + wx, p[2] * 1.3, 4));
+    const facing = Math.max(0, N[0] * k.sx + N[1] * k.sy + N[2] * k.sz);
+    const f = patch * facing * facing * 0.6;
+    const h = smooth(0.25, 0.8, fbm(p[0] * 1.1 + 20, p[1] * 1.1, p[2] * 1.1 + k.ox, 3)), hue = [0, 0, 0];
+    if (h < 0.7) mixc(C['#2F8BFF'], C['#3FA9C9', '#7A4A16'], h / 0.7, hue); else mixc(C['#3FA9C9', '#7A4A16'], C['#E6C34A'], (h - 0.7) / 0.3 * 0.7, hue);
+    o[0] += hue[0] * f; o[1] += hue[1] * f; o[2] += hue[2] * f;
+  } },
+  tigereye: { trans: 0.12, gloss: 140, spec: 0.8, fn(p, q, k, o) {
+    const u = p[1] * 7 + fbm(p[0] * 1.6 + k.ox, p[1] * 1.6, p[2] * 1.6 + k.oz, 4) * 1.8;
+    const band = 0.5 + 0.5 * Math.sin(u * 2.4);
+    mixc(C['#7A4A16'], C['#D9A040'], smooth(0.1, 0.9, band * 0.7 + fbm(p[0] * 2.5, p[1] * 8, p[2] * 2.5 + k.oz, 3) * 0.3), o);
+    mixInto(o, C['#3D220A'], 0.35 * smooth(0.6, 0.9, fbm(p[0] * 2 + 9, p[1] * 6, p[2] * 2, 3)));
+    const fib = 0.93 + 0.07 * Math.sin(p[1] * 170 + fbm(p[0] * 6, p[1] * 6, p[2] * 6, 2) * 9); o[0] *= fib; o[1] *= fib; o[2] *= fib;
+    const sh = Math.exp(-Math.pow((p[1] - k.sh) * 3, 2)) * (0.45 + 0.55 * band) * 0.5;
+    o[0] += C['#FFD98A'][0] * sh; o[1] += C['#FFD98A'][1] * sh; o[2] += C['#FFD98A'][2] * sh;
+  } },
+  onyx: { gloss: 220, spec: 1, refl: 0.7, fn(p, q, k, o) {
+    const n = fbm(p[0] * 2 + k.ox, p[1] * 2, p[2] * 2, 3) * 0.035; o[0] = 0.045 + n; o[1] = 0.045 + n; o[2] = 0.05 + n;
+  } },
+  lapis: { gloss: 90, spec: 0.8, fn(p, q, k, o) {
+    mixc(C['#16307F'], C['#3159C6'], fbm(p[0] * 2.6 + k.ox, p[1] * 2.6, p[2] * 2.6 + k.oz, 5), o);
+    mixInto(o, C['#B8C4DD'], 0.7 * smooth(0.68, 0.88, fbm(p[0] * 2 + 7, p[1] * 2, p[2] * 2 + k.ox, 4)));
+    const py = vnoise(p[0] * 30 + k.oz, p[1] * 30, p[2] * 30) * vnoise(p[0] * 11 + 3, p[1] * 11, p[2] * 11 + k.ox);
+    if (py > 0.5) { mixInto(o, C['#E3C264'], smooth(0.5, 0.6, py)); o[3] = 3; }
+  } },
+  aquamarine: { trans: 0.65, gloss: 130, spec: 0.9, fn(p, q, k, o) {
+    mixc(C['#D8F0F2'], C['#7FC0CD'], 0.35 + 0.45 * fbm(q[0] * 2.4 + k.ox, q[1] * 2.4, q[2] * 2.4 + k.oz, 4), o);
+    const nd = 1 - Math.abs(Math.sin(q[0] * 26 + fbm(q[0] * 2, q[1] * 2, q[2] * 2, 3) * 3));
+    mixInto(o, WHITE, 0.3 * smooth(0.93, 0.995, nd) * smooth(0.4, 0.7, fbm(q[0] * 2 + 2, q[1] * 2, q[2] * 2, 3)));
+  } },
+  nephrite: { trans: 0.2, gloss: 60, spec: 0.6, fn(p, q, k, o) {
+    mixc(C['#2A5A35'], C['#62A05F'], fbm(p[0] * 2.4 + k.ox, p[1] * 2.4, p[2] * 2.4 + k.oz, 5), o);
+    mixInto(o, C['#173A22'], 0.6 * smooth(0.6, 0.85, fbm(p[0] * 4 + 2, p[1] * 4, p[2] * 4 + k.ox, 4)));
+    if (vnoise(p[0] * 34 + k.oz, p[1] * 34, p[2] * 34) > 0.9) mixInto(o, C['#0F1A12'], 0.8);
+  } },
+  amazonite: { trans: 0.1, gloss: 70, spec: 0.65, fn(p, q, k, o) {
+    mixc(C['#2F8F80'], C['#86D6C6'], fbm(p[0] * 2 + k.ox, p[1] * 2, p[2] * 2 + k.oz, 4), o);
+    const s = 1 - Math.abs(Math.sin((p[0] + p[1] * 0.35) * 22 + fbm(p[0] * 3, p[1] * 3, p[2] * 3, 3) * 4));
+    mixInto(o, C['#EEFAF6'], 0.75 * smooth(0.88, 0.98, s) * smooth(0.35, 0.65, fbm(p[0] * 1.5 + 4, p[1] * 1.5, p[2] * 1.5 + k.ox, 3)));
+  } },
+  carnelian: { trans: 0.55, gloss: 100, spec: 0.85, fn(p, q, k, o) {
+    const t = fbm(q[0] * 2.6 + k.ox, q[1] * 2.6, q[2] * 2.6 + k.oz, 4) * 0.7 + 0.15 * Math.sin(q[1] * 7 + fbm(q[0] * 2, q[1] * 2, q[2] * 2, 3) * 4);
+    mixc(C['#F6A86E'], C['#B5360B'], 0.3 + 0.6 * smooth(0, 0.9, t), o);
+  } },
+  hematite: { metal: true, gloss: 140, spec: 1, fn(p, q, k, o) {
+    const t = C['#9AA3AB']; o[0] = t[0]; o[1] = t[1]; o[2] = t[2];
+  } },
+  rhodonite: { gloss: 70, spec: 0.65, fn(p, q, k, o) {
+    mixc(C['#E89CA5'], C['#C2667A'], fbm(p[0] * 2.5 + k.ox, p[1] * 2.5, p[2] * 2.5 + k.oz, 4), o);
+    const w = fbm(p[0] * 1.6 + 11, p[1] * 1.6, p[2] * 1.6 + k.ox, 5), w2 = fbm(p[0] * 3 + 5, p[1] * 3, p[2] * 3 + k.oz, 4);
+    mixInto(o, C['#1D1416'], Math.max(smooth(0.05, 0, Math.abs(w - 0.5)), 0.7 * smooth(0.025, 0, Math.abs(w2 - 0.5)), 0.85 * smooth(0.8, 0.9, fbm(p[0] * 2.2 + 30, p[1] * 2.2, p[2] * 2.2, 4))));
+  } },
+  malachite: { gloss: 110, spec: 0.8, fn(p, q, k, o) {
+    const dx = p[0] - k.cx, dy = p[1] - k.cy, dz = p[2] - k.cz;
+    const d = Math.sqrt(dx * dx + dy * dy + dz * dz) + fbm(p[0] * 1.8 + k.ox, p[1] * 1.8, p[2] * 1.8, 4) * 0.4;
+    const b = (d * 7) % 1, v = fbm(p[0] * 3, p[1] * 3, p[2] * 3 + k.oz, 3);
+    mixc(C['#1F9A60'], C['#5FD29A'], smooth(0.15, 0.95, b) * (0.6 + 0.4 * v), o);
+    mixInto(o, C['#0B4A2C'], smooth(0.12, 0.02, b) + smooth(0.92, 1, b) * 0.6);
+  } },
+  howlite: { gloss: 60, spec: 0.6, fn(p, q, k, o) {
+    mixc(C['#F7F5F0'], C['#DCD8CF'], fbm(p[0] * 2.5 + k.ox, p[1] * 2.5, p[2] * 2.5 + k.oz, 4), o);
+    const r1 = 1 - Math.abs(fbm(p[0] * 2 + 3, p[1] * 2, p[2] * 2 + k.ox, 5) * 2 - 1), r2 = 1 - Math.abs(fbm(p[0] * 4 + 8, p[1] * 4, p[2] * 4 + k.oz, 4) * 2 - 1);
+    mixInto(o, C['#55524D'], Math.max(0.85 * smooth(0.9, 0.975, r1), 0.55 * smooth(0.93, 0.985, r2)));
+  } },
+};
+
+function rotation(rnd) {
+  const a = rnd() * 6.283, b = Math.acos(2 * rnd() - 1), c = rnd() * 6.283;
+  const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b), cc = Math.cos(c), sc = Math.sin(c);
+  return [ca * cc - sa * cb * sc, -ca * sc - sa * cb * cc, sa * sb, sa * cc + ca * cb * sc, -sa * sc + ca * cb * cc, -ca * sb, sb * sc, sb * cc, cb];
+}
+const norm3 = (x, y, z) => { const l = Math.hypot(x, y, z); return [x / l, y / l, z / l]; };
+const LV = norm3(-0.5, -0.62, 0.6), HV = norm3(LV[0], LV[1], LV[2] + 1);
+
 function paintStone(st, v) {
-  const S = 160, r = S / 2, c = document.createElement('canvas');
+  const S = 192, c = document.createElement('canvas');
   c.width = c.height = S;
-  const g = c.getContext('2d');
-  const rnd = mulberry(hash(st.id) + v * 7919 + 1);
-  const L = st.look, [cl, cm_, cd] = L.c;
-  const R = () => rnd() * S;
-  const blob = (x, y, rad, col, a) => {
-    const gr = g.createRadialGradient(x, y, 0, x, y, rad);
-    gr.addColorStop(0, rgba(col, a)); gr.addColorStop(1, rgba(col, 0));
-    g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
-  };
-  const wisps = (n, col, a) => {
-    for (let i = 0; i < n; i++) {
-      g.strokeStyle = rgba(col, a * (0.5 + rnd() * 0.5)); g.lineWidth = 1 + rnd() * 3;
-      g.beginPath(); g.moveTo(R(), R()); g.bezierCurveTo(R(), R(), R(), R(), R(), R()); g.stroke();
-    }
-  };
-  const veins = (n, col) => {
-    for (let i = 0; i < n; i++) {
-      let x = R(), y = R(), a = rnd() * Math.PI * 2;
-      g.strokeStyle = rgba(col, 0.45 + rnd() * 0.45); g.lineWidth = 0.7 + rnd() * 2.6;
-      g.beginPath(); g.moveTo(x, y);
-      for (let s = 0; s < 26; s++) { a += (rnd() - 0.5) * 0.9; x += Math.cos(a) * 7; y += Math.sin(a) * 7; g.lineTo(x, y); }
-      g.stroke();
-    }
-  };
-  g.beginPath(); g.arc(r, r, r - 1, 0, Math.PI * 2); g.clip();
-  const base = g.createRadialGradient(r * (0.6 + rnd() * 0.3), r * (0.55 + rnd() * 0.3), r * 0.05, r, r, r * 1.05);
-  base.addColorStop(0, cl); base.addColorStop(0.55, cm_); base.addColorStop(1, cd);
-  g.fillStyle = base; g.fillRect(0, 0, S, S);
-  switch (L.type) {
-    case 'translucent':
-      for (let i = 0; i < 7; i++) blob(R(), R(), 20 + rnd() * 40, rnd() < 0.5 ? cl : cd, 0.35);
-      blob(r * 1.35, r * 1.4, r * 0.8, cl, 0.55); wisps(4, '#FFFFFF', 0.2); break;
-    case 'cloudy':
-      for (let i = 0; i < 9; i++) blob(R(), R(), 18 + rnd() * 40, '#FFFFFF', 0.3);
-      for (let i = 0; i < 4; i++) blob(R(), R(), 20 + rnd() * 30, cd, 0.25);
-      blob(r * 1.3, r * 1.4, r * 0.7, cl, 0.6); break;
-    case 'clear':
-      for (let i = 0; i < 5; i++) blob(R(), R(), 10 + rnd() * 30, cd, 0.28);
-      wisps(3, '#FFFFFF', 0.6);
-      g.strokeStyle = 'rgba(90,110,130,.35)'; g.lineWidth = 2;
-      g.beginPath(); g.arc(r, r, r * 0.82, 0.3 + rnd(), 2.4 + rnd()); g.stroke();
-      blob(r * 1.3, r * 1.35, r * 0.6, '#FFFFFF', 0.7); break;
-    case 'sheen':
-      for (let i = 0; i < 5; i++) blob(R(), R(), 20 + rnd() * 30, '#FFFFFF', 0.35);
-      g.save(); g.translate(r * (0.85 + rnd() * 0.35), r * (0.8 + rnd() * 0.35)); g.rotate(rnd() * 3); g.scale(1.6, 0.7);
-      blob(0, 0, r * 0.6, L.accent, 0.7); g.restore(); break;
-    case 'flash':
-      veins(5, cd);
-      g.save(); g.globalCompositeOperation = 'lighter';
-      for (let k = 0; k < 3; k++) {
-        g.save(); g.translate(S * 0.15 + R() * 0.7, S * 0.15 + R() * 0.7); g.rotate(rnd() * 3); g.scale(1.8, 0.6);
-        blob(0, 0, r * (0.35 + rnd() * 0.25), L.accent[(v + k) % 3], 0.5); g.restore();
+  const g = c.getContext('2d'), img = g.createImageData(S, S), D = img.data;
+  const M = MATERIALS[st.id], rnd = mulberry(hash(st.id) + v * 7919 + 1), R = rotation(rnd);
+  const sd = norm3(rnd() - 0.5, rnd() - 0.5, 1.1);
+  const k = { ox: rnd() * 40, oz: rnd() * 40, sx: sd[0], sy: sd[1], sz: sd[2], sh: (rnd() - 0.5) * 0.6, cx: (rnd() - 0.5) * 2.4, cy: (rnd() - 0.5) * 2.4, cz: (rnd() - 0.5) * 2.4 };
+  const o = [0, 0, 0, 1, 0], p = [0, 0, 0], q = [0, 0, 0], N = [0, 0, 0];
+  const trans = M.trans || 0, refl = M.refl ?? 0.45;
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      const nx = (x + 0.5) / S * 2 - 1, ny = (y + 0.5) / S * 2 - 1, r2 = nx * nx + ny * ny, dist = Math.sqrt(r2);
+      const alpha = clamp01((1 - dist) * S / 2 + 0.5);
+      if (alpha <= 0) continue;
+      const nz = Math.sqrt(Math.max(0, 1 - r2));
+      N[0] = nx; N[1] = ny; N[2] = nz;
+      p[0] = R[0] * nx + R[1] * ny + R[2] * nz; p[1] = R[3] * nx + R[4] * ny + R[5] * nz; p[2] = R[6] * nx + R[7] * ny + R[8] * nz;
+      const qx = nx * 0.8, qy = ny * 0.8, qz = nz * 0.3;
+      q[0] = R[0] * qx + R[1] * qy + R[2] * qz; q[1] = R[3] * qx + R[4] * qy + R[5] * qz; q[2] = R[6] * qx + R[7] * qy + R[8] * qz;
+      o[3] = 1; o[4] = 0;
+      M.fn(p, q, k, o, N);
+      const ndl = nx * LV[0] + ny * LV[1] + nz * LV[2], ndh = Math.max(0, nx * HV[0] + ny * HV[1] + nz * HV[2]);
+      const Rx = 2 * nz * nx, Ry = 2 * nz * ny, Rz = 2 * nz * nz - 1;
+      const env = 0.1 + 0.8 * smooth(0.35, -0.7, Ry);
+      let box = 0;
+      if (Rz > 0.05) { const bx = Rx + 0.42, by = Ry + 0.46; box = Math.exp(-(bx * bx / 0.028 + by * by / 0.018)) * 0.62 + Math.exp(-(bx * bx + by * by) / 0.16) * 0.12; }
+      const fres = 0.04 + 0.96 * Math.pow(1 - nz, 5);
+      const specl = Math.pow(ndh, M.gloss) * M.spec * o[3] * 0.55;
+      let r, gg, b;
+      if (M.metal) {
+        const e = env * 0.85 + 0.06 + 0.12 * Math.max(0, ndl);
+        r = o[0] * e; gg = o[1] * e; b = o[2] * e;
+        const h = box * 1.1 + specl; r += h; gg += h; b += h;
+      } else if (M.clear) {
+        const inv = smooth(-0.4, 0.9, ny * 0.75 + nx * 0.4);
+        const edge = Math.pow(1 - nz, 1.6) * 0.55;
+        r = (0.17 + 0.42 * inv * o[0]) * (1 - edge); gg = (0.21 + 0.42 * inv * o[1]) * (1 - edge); b = (0.2 + 0.42 * inv * o[2]) * (1 - edge);
+        const veil = o[4] * (0.5 + 0.5 * Math.max(0, ndl)); r += (0.95 - r) * veil; gg += (0.96 - gg) * veil; b += (0.97 - b) * veil;
+        const caustic = Math.pow(clamp01(0.5 + 0.5 * (nx * 0.6 + ny * 0.68)), 6) * (0.4 + 0.6 * nz) * 0.6;
+        r += caustic; gg += caustic; b += caustic;
+        r = r * (1 - fres * 0.6) + env * fres * 0.6; gg = gg * (1 - fres * 0.6) + env * fres * 0.6; b = b * (1 - fres * 0.6) + env * fres * 0.6;
+        const h = box * 0.95 + specl; r += h; gg += h; b += h;
+      } else {
+        let diff = 0.3 + 0.75 * Math.max(0, ndl);
+        diff = diff * (1 - trans * 0.5) + trans * 0.5 * (0.62 + 0.38 * (ndl * 0.5 + 0.5));
+        r = o[0] * diff; gg = o[1] * diff; b = o[2] * diff;
+        if (trans) {
+          const glow = trans * Math.pow(clamp01(0.5 + 0.5 * (nx * 0.6 + ny * 0.68)), 2.2) * (0.3 + 0.7 * nz);
+          r += o[0] * glow * 0.9 + glow * 0.06; gg += o[1] * glow * 0.9 + glow * 0.06; b += o[2] * glow * 0.9 + glow * 0.06;
+        }
+        r = r * (1 - fres * refl) + env * fres * refl; gg = gg * (1 - fres * refl) + env * fres * refl; b = b * (1 - fres * refl) + env * fres * refl;
+        const h = (box * 0.85 + specl) * M.spec; r += h; gg += h; b += h;
       }
-      g.restore(); break;
-    case 'chatoyant': {
-      g.save(); g.translate(r, r); g.rotate(-0.4 + rnd() * 0.8); g.translate(-r, -r);
-      let y = -30; const ph = rnd() * 6;
-      while (y < S + 30) {
-        const h = 3 + rnd() * 9;
-        g.fillStyle = rgba(rnd() < 0.5 ? cl : cd, 0.3 + rnd() * 0.3);
-        g.beginPath(); g.moveTo(-30, y);
-        for (let x = -30; x <= S + 30; x += 10) g.lineTo(x, y + Math.sin(x * 0.05 + ph) * 3);
-        for (let x = S + 30; x >= -30; x -= 10) g.lineTo(x, y + h + Math.sin(x * 0.05 + ph) * 3);
-        g.fill(); y += h;
-      }
-      const off = (rnd() - 0.5) * 40, lg = g.createLinearGradient(0, r + off - 26, 0, r + off + 26);
-      lg.addColorStop(0, rgba(L.accent, 0)); lg.addColorStop(0.5, rgba(L.accent, 0.75)); lg.addColorStop(1, rgba(L.accent, 0));
-      g.fillStyle = lg; g.fillRect(-30, r + off - 26, S + 60, 52); g.restore(); break;
-    }
-    case 'solid': blob(R(), R(), 40, cl, 0.18); break;
-    case 'flecks':
-      for (let i = 0; i < 6; i++) blob(R(), R(), 15 + rnd() * 30, L.accent2, 0.25);
-      for (let i = 0; i < 6; i++) blob(R(), R(), 15 + rnd() * 25, cd, 0.4);
-      for (let i = 0, n = 40 + rnd() * 30; i < n; i++) { g.fillStyle = rgba(L.accent, 0.6 + rnd() * 0.4); g.beginPath(); g.arc(R(), R(), 0.8 + rnd() * 2.4, 0, 7); g.fill(); }
-      break;
-    case 'mottled':
-      for (let i = 0; i < 14; i++) blob(R(), R(), 12 + rnd() * 35, rnd() < 0.5 ? L.accent : cd, 0.38); break;
-    case 'streaks':
-      for (let i = 0; i < 6; i++) blob(R(), R(), 15 + rnd() * 30, cd, 0.3);
-      for (let i = 0; i < 10; i++) {
-        const x = R(), y = R(), a = 0.5 + rnd() * 0.4, len = 20 + rnd() * 60;
-        g.strokeStyle = rgba(L.accent, 0.35 + rnd() * 0.4); g.lineWidth = 1 + rnd() * 3;
-        g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a) * len / 2 + rnd() * 10, y + Math.sin(a) * len / 2, x + Math.cos(a) * len, y + Math.sin(a) * len); g.stroke();
-      }
-      break;
-    case 'veins':
-      for (let i = 0; i < 6; i++) blob(R(), R(), 15 + rnd() * 30, rnd() < 0.5 ? cl : cd, 0.3);
-      veins(3 + Math.floor(rnd() * 3), L.accent); break;
-    case 'bands': {
-      const t = rnd() * Math.PI * 2, d = r * (0.7 + rnd() * 0.9), cx = r + Math.cos(t) * d, cy = r + Math.sin(t) * d, ph = rnd() * 6;
-      const cols = [cl, cm_, L.accent, cm_, cd, cl];
-      let rad = 3, k = 0;
-      while (rad < S * 2) {
-        const w = cols[k % cols.length] === L.accent ? 1 + rnd() * 2 : 3 + rnd() * 7;
-        g.strokeStyle = cols[k % cols.length]; g.lineWidth = w + 0.6;
-        g.beginPath();
-        for (let a = 0; a <= Math.PI * 2 + 0.05; a += 0.08) { const rr = rad + w / 2 + Math.sin(a * 5 + ph) * 2; g.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); }
-        g.stroke(); rad += w; k++;
-      }
-      break;
-    }
-    case 'metallic': {
-      const lg = g.createLinearGradient(0, 0, S, S);
-      lg.addColorStop(0.2, rgba(cl, 0)); lg.addColorStop(0.42, rgba(cl, 0.55)); lg.addColorStop(0.6, rgba(cl, 0));
-      g.fillStyle = lg; g.fillRect(0, 0, S, S); break;
+      const i = (y * S + x) * 4;
+      D[i] = clamp01(r) * 255; D[i + 1] = clamp01(gg) * 255; D[i + 2] = clamp01(b) * 255; D[i + 3] = alpha * 255;
     }
   }
-  const sh = g.createRadialGradient(r * 0.8, r * 0.72, r * 0.2, r, r, r);
-  sh.addColorStop(0, 'rgba(0,0,0,0)'); sh.addColorStop(0.7, 'rgba(0,0,0,0.08)'); sh.addColorStop(1, 'rgba(0,0,0,0.5)');
-  g.fillStyle = sh; g.fillRect(0, 0, S, S);
-  const glossy = L.type === 'metallic' || L.type === 'solid';
-  g.save(); g.translate(r * 0.62, r * 0.5); g.rotate(-0.6); g.scale(1.4, 0.8); blob(0, 0, r * 0.32, '#FFFFFF', glossy ? 0.85 : 0.6); g.restore();
-  blob(r * 0.58, r * 0.46, r * 0.08, '#FFFFFF', 0.9);
+  g.putImageData(img, 0, 0);
   return c;
 }
 
@@ -715,14 +804,29 @@ function drawBoard(canvas, S, opts = {}) {
       else { const [x, y] = pos(so); ctx.arc(x, y, Math.max(so.w, 5) / 2 * ppm + 4, 0, 7); }
       ctx.stroke();
     }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
     if (dragging >= 0) {
-      const o = G.lay[dragging];
-      const a = Math.atan2(drag.y - cy, drag.x - cx);
+      const t = dropTarget(G, drag.x, drag.y, dragging);
+      // delete zone in the middle of the board
+      ctx.fillStyle = t.del ? 'rgba(214,92,70,.32)' : 'rgba(255,255,255,.035)';
+      ctx.strokeStyle = t.del ? 'rgba(240,140,120,.8)' : 'rgba(233,239,235,.25)'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]);
+      ctx.beginPath(); ctx.arc(cx, cy, R * 0.5, 0, 7); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = t.del ? '#FFE3DC' : 'rgba(233,239,235,.6)'; ctx.font = `500 ${S * 0.03}px Manrope, sans-serif`;
+      ctx.fillText(t.del ? 'Відпустіть,' : 'Перетягніть сюди,', cx, cy - S * 0.008);
+      ctx.fillText(t.del ? 'щоб видалити' : 'щоб видалити', cx, cy + S * 0.03);
+      if (t.mark != null) {
+        ctx.strokeStyle = '#E8CB8A'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        const r0 = R - gw / 2 + 2, r1 = R + gw / 2 - 2;
+        ctx.beginPath(); ctx.moveTo(cx + Math.cos(t.mark) * r0, cy + Math.sin(t.mark) * r0); ctx.lineTo(cx + Math.cos(t.mark) * r1, cy + Math.sin(t.mark) * r1); ctx.stroke();
+      }
+      const o = G.lay[dragging], a = Math.atan2(drag.y - cy, drag.x - cx);
+      ctx.save(); ctx.translate(drag.x, drag.y); ctx.scale(1.15, 1.15); ctx.translate(-drag.x, -drag.y);
       drawItem(ctx, G, { ...o, a }, drag.x, drag.y, 0.95);
+      ctx.restore();
+      return G;
     }
     // centre readout
     const n = stoneCount();
-    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
     if (!state.items.length) {
       ctx.fillStyle = 'rgba(233,239,235,.75)'; ctx.font = `${S * 0.05}px Forum, serif`;
       ctx.fillText('Оберіть камінь,', cx, cy - S * 0.005);
@@ -759,31 +863,45 @@ function hitAt(x, y) {
   }
   return best;
 }
+function dropTarget(G, x, y, from) {
+  if (Math.hypot(x - G.cx, y - G.cy) < G.R * 0.5) return { del: true };
+  const ang = Math.atan2(y - G.cy, x - G.cx), rest = G.lay.filter(o => o.i !== from);
+  if (!rest.length) return { to: 0, mark: null };
+  let j = 0, bd = Infinity;
+  rest.forEach((o, k) => { const df = Math.abs(normA(ang - o.a)); if (df < bd) { bd = df; j = k; } });
+  const after = normA(ang - rest[j].a) > 0, half = rest[j].w / 2 * G.ppm / G.R;
+  return { to: after ? j + 1 : j, mark: rest[j].a + (after ? half : -half) };
+}
 const local = e => { const r = board.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+// A touch that starts on a bead drags it; a touch anywhere else on the board scrolls the page.
+board.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  const r = board.getBoundingClientRect(), t = e.touches[0];
+  if (hitAt(t.clientX - r.left, t.clientY - r.top) >= 0) e.preventDefault();
+}, { passive: false });
+board.addEventListener('touchmove', e => { if (drag && drag.i >= 0) e.preventDefault(); }, { passive: false });
 board.addEventListener('pointerdown', e => {
-  const [x, y] = local(e), i = hitAt(x, y);
-  drag = { i, x0: x, y0: y, x, y, moved: false, mouse: e.pointerType !== 'touch' };
-  if (i >= 0 && drag.mouse) board.setPointerCapture(e.pointerId);
+  if (!e.isPrimary) return;
+  const [x, y] = local(e), i = hitAt(x, y), touch = e.pointerType !== 'mouse';
+  // on touch the dragged bead floats above the finger so it stays visible
+  drag = { i, x0: x, y0: y, x, y, moved: false, lift: touch ? 40 : 0, slop: touch ? 8 : 5 };
+  if (i >= 0) { try { board.setPointerCapture(e.pointerId); } catch (err) {} }
 });
 board.addEventListener('pointermove', e => {
-  if (!drag || drag.i < 0 || !drag.mouse) return;
-  const [x, y] = local(e); drag.x = x; drag.y = y;
-  if (!drag.moved && Math.hypot(x - drag.x0, y - drag.y0) > 6) drag.moved = true;
-  if (drag.moved) draw();
+  if (!drag || drag.i < 0 || !e.isPrimary) return;
+  const [x, y] = local(e);
+  if (!drag.moved && Math.hypot(x - drag.x0, y - drag.y0) > drag.slop) drag.moved = true;
+  if (!drag.moved) return;
+  drag.x = x; drag.y = y - drag.lift;
+  draw();
 });
 board.addEventListener('pointerup', e => {
-  if (!drag) return;
+  if (!drag || !e.isPrimary) return;
   const d = drag; drag = null;
   if (d.moved && d.i >= 0) {
-    const G = geo, ang = Math.atan2(d.y - G.cy, d.x - G.cx);
-    const rest = G.lay.filter(o => o.i !== d.i);
-    let to = rest.length;
-    if (rest.length) {
-      let j = 0, bd = Infinity;
-      rest.forEach((o, k) => { const df = Math.abs(normA(ang - o.a)); if (df < bd) { bd = df; j = k; } });
-      to = normA(ang - rest[j].a) > 0 ? j + 1 : j;
-    }
-    if (to !== d.i) commit(() => { const [it] = state.items.splice(d.i, 1); state.items.splice(to, 0, it); state.sel = to; });
+    const t = dropTarget(geo, d.x, d.y, d.i);
+    if (t.del) { commit(() => { state.items.splice(d.i, 1); state.sel = -1; }); toast('Видалено', true); }
+    else if (t.to !== d.i) commit(() => { const [it] = state.items.splice(d.i, 1); state.items.splice(t.to, 0, it); state.sel = t.to; });
     else render();
     return;
   }
@@ -1030,7 +1148,7 @@ function render() {
   // selection
   const cur = state.items[state.sel];
   const si = $('#selinfo');
-  if (!cur) si.textContent = 'Натисніть бусину на дошці, щоб вибрати її. Мишею бусини можна перетягувати.';
+  if (!cur) si.textContent = 'Перетягніть бусину, щоб змінити порядок, або в центр, щоб видалити. Натисніть, щоб вибрати.';
   else if (cur.k === 's') si.innerHTML = `Вибрано: <b>${STONE[cur.id].name}</b>, ${state.size} мм, ${beadPrice(cur.id)} грн. Натисніть інший камінь, щоб замінити.`;
   else if (cur.k === 'sp') si.innerHTML = `Вибрано: <b>розділювач</b>, ${METALS[state.metal].short}.`;
   else si.innerHTML = `Вибрано: <b>підвіска «${CHARM[cur.id].name}»</b>, ${METALS[state.metal].short}.`;
@@ -1062,7 +1180,7 @@ function orderText(sum) {
   const fit = FITS.find(f => f.v === state.fit);
   const seq = state.items.map(it => it.k === 's' ? STONE[it.id].name : it.k === 'sp' ? 'розділювач' : `підвіска «${CHARM[it.id].name}»`).join(' → ');
   return [
-    'Замовлення браслета «Друза»',
+    'Замовлення браслета Air Chains',
     '',
     `Обхват зап’ястка: ${cm(state.wrist)} см, посадка: ${fit.label.toLowerCase()} (${fit.sub})`,
     `Довжина: ${cm(lengthOf(state.items))} см, бусини ${state.size} мм, метал: ${METALS[state.metal].name}`,
@@ -1092,11 +1210,13 @@ $('#form').addEventListener('submit', e => {
   $('#result').hidden = false;
   $('#result').scrollIntoView({ block: 'nearest' });
 });
-$('#copy').addEventListener('click', () => {
+function copyOrder(silentOk) {
   const ta = $('#ordertext');
-  const fallback = () => { ta.focus(); ta.select(); toast('Текст виділено. Натисніть Ctrl+C, щоб скопіювати.'); };
-  try { navigator.clipboard.writeText(ta.value).then(() => toast('Текст замовлення скопійовано'), fallback); } catch (e) { fallback(); }
-});
+  const fallback = () => { ta.focus(); ta.select(); toast('Текст виділено. Скопіюйте його вручну.'); };
+  try { navigator.clipboard.writeText(ta.value).then(() => toast(silentOk ? 'Текст скопійовано. Вставте його в Direct.' : 'Текст замовлення скопійовано'), fallback); } catch (e) { fallback(); }
+}
+$('#copy').addEventListener('click', () => copyOrder(false));
+$('#copy-dm').addEventListener('click', () => copyOrder(true));
 
 /* ---------- catalogue & size table ---------- */
 $('#catalog').replaceChildren(...STONES.map(s => {
