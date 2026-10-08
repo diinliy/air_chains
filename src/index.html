@@ -65,7 +65,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .hdr { display: flex; gap: 10px; align-items: center; }
 .hdr .ig { display: inline-flex; color: var(--ink); }
 .hdr .ig svg { width: 20px; height: 20px; }
-.menubtn { display: none !important; }
+.menubtn { display: none !important; position: relative; }
+.navcount { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font: 600 11px/1 var(--mono); vertical-align: 2px; }
+.menubtn .navcount { position: absolute; top: -4px; right: -4px; margin: 0; }
 @media (max-width: 860px) {
   .menubtn { display: inline-grid !important; }
   .nav { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; margin: 0; padding: 4px clamp(16px, 4vw, 40px) 18px; background: var(--bg); border-bottom: 1px solid var(--line); box-shadow: 0 20px 30px -24px rgba(0,0,0,.35); }
@@ -327,7 +329,9 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   .panel > [data-tab].on { display: grid; }
   .panel { min-height: 320px; align-content: start; }
 }
-.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 40; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); display: flex; gap: 12px; align-items: center; }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 40; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; transition: opacity .2s, transform .2s; width: max-content; max-width: calc(100% - 32px); display: flex; gap: 14px; align-items: center; justify-content: space-between; }
+.toast #toastmsg { min-width: 0; }
+.toast button { white-space: nowrap; flex: none; }
 .toast.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 .toast button { border: 0; background: transparent; color: var(--accent-soft); font-weight: 700; cursor: pointer; padding: 0; }
 @media (max-width: 900px) { .toast { bottom: calc(90px + env(safe-area-inset-bottom, 0px)); } }
@@ -342,7 +346,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       Air Chains
     </a>
     <nav class="nav" id="nav" aria-label="Розділи">
-      <a href="#constructor" data-nav="constructor">Конструктор</a>
+      <a href="#constructor" data-nav="constructor">Конструктор<span class="navcount" hidden></span></a>
       <a href="#bracelets" data-nav="bracelets">Готові браслети</a>
       <a href="#stones" data-nav="stones">Камені</a>
       <a href="#info" data-nav="info">Допомога</a>
@@ -350,7 +354,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
     <div class="hdr">
       <a class="ig" href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
       <button class="themebtn" id="theme" type="button" aria-label="Темна тема"></button>
-      <button class="themebtn menubtn" id="menubtn" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <button class="themebtn menubtn" id="menubtn" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="navcount" hidden></span></button>
     </div>
   </div>
 </header>
@@ -1403,6 +1407,7 @@ function render() {
   $('#total').textContent = uah(sum);
   $('#mtotal').textContent = uah(sum);
   $('#tabprice').textContent = uah(sum);
+  document.querySelectorAll('.navcount').forEach(c => { c.hidden = !n; c.textContent = n; });
   $('#hudtotal').textContent = `${n} ${plural(n, 'бусина', 'бусини', 'бусин')} · ${uah(sum)}`;
   $('#msub').textContent = `${n} ${plural(n, 'бусина', 'бусини', 'бусин')} · ${cm(total)} см`;
   renderPalette(); renderInfo(); draw(); renderRecap(lines);
@@ -1485,7 +1490,12 @@ $('#catalog').replaceChildren(...STONES.map(s => {
   const dl = el('dl');
   [['Твердість', s.mohs + ' за Моосом'], ['Походження', s.origin], ['6 / 8 / 10 мм', `${[6, 8, 10].map(d => beadPrice(s.id, d)).join(' / ')} грн`]].forEach(([t, d]) => dl.append(el('dt', { textContent: t }), el('dd', { textContent: d })));
   const add = el('button', { type: 'button', className: 'add', textContent: 'Додати в браслет' });
-  add.addEventListener('click', () => { state.sel = -1; addStone(s.id); location.hash = '#constructor'; });
+  add.addEventListener('click', () => {
+    state.sel = -1;
+    const before = stoneCount();
+    addStone(s.id);
+    if (stoneCount() > before) toast(`${s.name} додано у ваш браслет · ${stoneCount()} ${plural(stoneCount(), 'бусина', 'бусини', 'бусин')}`, { label: 'До конструктора', fn: () => { location.hash = '#constructor'; } });
+  });
   return el('article', { className: 'card' }, [
     el('div', { className: 'head' }, [swatch(s.id, 64, 2), el('div', {}, [el('h3', { textContent: s.name }), el('div', { className: 'tags' }, s.intents.map(k => el('span', { textContent: INTENTS[k] })))])]),
     el('p', { textContent: s.meaning }), dl, add,
@@ -1503,11 +1513,16 @@ $('#catalog').replaceChildren(...STONES.map(s => {
 
 /* ---------- toast ---------- */
 let toastTimer;
-function toast(msg, withUndo = false) {
-  const t = $('#toast'); $('#toastmsg').textContent = msg; $('#toastundo').hidden = !withUndo;
-  t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), withUndo ? 5000 : 2400);
+let toastAction = null;
+// action: { label, fn } for a button in the toast; true means the usual "Скасувати"
+function toast(msg, action = null) {
+  if (action === true) action = { label: 'Скасувати', fn: undo };
+  const t = $('#toast'), btn = $('#toastundo');
+  $('#toastmsg').textContent = msg; toastAction = action;
+  btn.hidden = !action; if (action) btn.textContent = action.label;
+  t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), action ? 4500 : 2400);
 }
-$('#toastundo').addEventListener('click', () => { undo(); $('#toast').classList.remove('on'); });
+$('#toastundo').addEventListener('click', () => { const a = toastAction; $('#toast').classList.remove('on'); if (a) a.fn(); });
 
 /* ---------- boot ---------- */
 let loaded = false;
