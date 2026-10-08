@@ -516,8 +516,10 @@ const PRESETS = [
 ];
 const BASE = 90, GIFT = 70, TOL = 2, MAX_CHARMS = 3, SPACER_W = 3;
 const KEY = 'airchains-design-v1';
-// Address of the order relay (worker/telegram-order.js). Empty: orders are copied and sent via Instagram Direct.
-const ORDER_ENDPOINT = 'https://air-chains-orders.diinliy.workers.dev';
+// Order relay (worker/telegram-order.js). It accepts orders only from the sites listed in its
+// ALLOWED_ORIGIN, so elsewhere (e.g. the claude.ai preview) the form falls back to Instagram Direct.
+const ORDER_SITES = ['diinliy.github.io'];
+const ORDER_ENDPOINT = ORDER_SITES.includes(location.hostname) ? 'https://air-chains-orders.diinliy.workers.dev' : '';
 
 const state = { wrist: 160, fit: 15, size: 8, metal: 'silver', gift: false, items: [], sel: -1 };
 let filter = 'all', colorF = 'all', infoId = 'amethyst', tab = 'stones';
