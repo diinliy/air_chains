@@ -235,7 +235,7 @@ function card(o) {
   const c = el('article', { className: 'card' }, [
     thumb,
     el('div', { className: 'body' }, [
-      el('div', { className: 'row' }, [el('span', { className: 'name', textContent: o.n || 'Без імені' }), el('span', { className: 'pill st-' + st, textContent: STATUS[st] })]),
+      el('div', { className: 'row' }, [el('span', { className: 'name', textContent: o.n || 'Без імені' }), el('span', { className: 'pill st-' + st, textContent: STATUS[st] }), o.pay === 'p' ? el('span', { className: 'pill st-done', textContent: '💳 оплачено' }) : o.pay === 'w' ? el('span', { className: 'pill st-cancel', textContent: '💳 очікує оплату' }) : null]),
       el('div', { className: 'row' }, [el('span', { className: 'total', textContent: o.s || '—' }), o.b ? el('span', { className: 'muted', textContent: o.b }) : null, el('span', { className: 'when', textContent: fmtDate(o.t) })]),
       el('div', { className: 'row' }, [o.p ? el('a', { className: 'phone', href: 'tel:' + o.p.replace(/[^+\d]/g, ''), textContent: o.p }) : null]),
       el('div', { className: 'row' }, [sel, toggle]),
@@ -257,6 +257,7 @@ function details(o) {
       : el('div', { className: 'row' }, [copy, del]);
     const kids = [];
     if (order.contact) kids.push(el('p', { className: 'muted', textContent: 'Зв’язок: ' + order.contact }));
+    if (order.prepay) kids.push(el('p', { className: 'muted', textContent: order.prepay.status === 'paid' ? `Передоплата ${order.prepay.amount} грн отримана ${fmtDate(order.prepay.at)}${order.prepay.test ? ' (тестовий режим)' : ''}` : `Передоплата ${order.prepay.amount} грн: ще не оплачено` }));
     if (order.hasImage) { const big = el('img', { alt: 'Браслет із замовлення' }); image(o.id).then(u => { big.src = u; }).catch(() => {}); kids.push(big); }
     box.replaceChildren(...kids, pre, actions);
   }).catch(() => box.replaceChildren(el('p', { className: 'err', textContent: 'Не вдалося відкрити замовлення.' })));

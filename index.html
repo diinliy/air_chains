@@ -285,6 +285,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .field textarea { min-height: 84px; resize: vertical; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .err { color: var(--warn); font-size: 13px; min-height: 18px; }
+.paybox { display: grid; gap: 10px; padding: 16px; border-radius: 14px; border: 1px solid var(--btn); background: color-mix(in srgb, var(--btn) 7%, var(--surface)); }
+.paybox p:first-child { font-weight: 600; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .sent { font-size: 15px; line-height: 1.5; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--ok) 12%, transparent); color: var(--ink); }
 .recap { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 14px; align-content: start; }
@@ -515,6 +517,10 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       <p>Можна замовити кілька браслетів одразу. Кожен збираємо окремо, а відправляємо разом.</p>
     </section>
     <section class="wrap cartwrap">
+      <div class="paybox" id="pendingpay" hidden>
+        <p id="pendingtext"></p>
+        <div class="row"><button class="cta" type="button" id="pendingbtn"></button><button class="linkbtn" type="button" id="pendingdone">Я вже оплатив(ла)</button></div>
+      </div>
       <div class="cartlist" id="cartlist"></div>
       <div class="ctotal" id="ctotal"><span class="label">Разом за кошик</span><strong id="carttotal">0 грн</strong></div>
       <div class="row"><a class="cta ghost" href="#constructor">Зібрати ще один</a><a class="cta ghost" href="#bracelets">Готові браслети</a></div>
@@ -546,6 +552,11 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
         <div class="result" id="result" hidden>
           <p class="label" id="result-title">Замовлення сформовано</p>
           <p class="sent" id="result-sent" hidden></p>
+          <div class="paybox" id="paybox" hidden>
+            <p id="paytext"></p>
+            <button class="cta" type="button" id="paybtn"></button>
+            <p class="note">Оплата проходить на захищеній сторінці LiqPay (ПриватБанк): картка, Apple Pay, Google Pay або Privat24. Дані картки ми не бачимо.</p>
+          </div>
           <textarea id="ordertext" readonly aria-label="Текст замовлення"></textarea>
           <div class="row"><a class="cta" id="copy-dm" href="https://ig.me/m/air_chains" target="_blank" rel="noopener">Скопіювати і написати в Direct</a><button class="cta ghost" type="button" id="copy">Лише скопіювати</button></div>
           <p class="note">Текст копіюється автоматично. У Direct просто вставте його і надішліть.</p>
@@ -1632,16 +1643,50 @@ $('#form').addEventListener('submit', e => {
   if (!ORDER_ENDPOINT) { show('Замовлення сформовано'); return; }
   const btn = $('#f-submit'); btn.disabled = true; btn.textContent = 'Надсилаємо…';
   fetch(ORDER_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, image: cartPhoto(), summary: `${$('#f-name').value.trim()}, ${$('#f-phone').value.trim()} · ${count} ${plural(count, 'браслет', 'браслети', 'браслетів')} · ${uah(sum)}`, meta: { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), contact: $('#f-contact').value.trim(), total: uah(sum), beads: `${count} ${plural(count, 'браслет', 'браслети', 'браслетів')}` }, website: $('#f-website').value }) })
-    .then(r => r.json().catch(() => ({})).then(d => { if (!r.ok || !d.ok) throw new Error(d.error || r.status); }))
-    .then(() => {
-      show('Замовлення надіслано', 'Дякуємо! Замовлення вже у нас. Майстер зв’яжеться з вами найближчим часом і надішле фото підібраних каменів.');
+    .then(r => r.json().catch(() => ({})).then(d => { if (!r.ok || !d.ok) throw new Error(d.error || r.status); return d; }))
+    .then(d => {
+      if (d.pay) {
+        show('Замовлення прийнято', `Дякуємо! Замовлення вже у нас. Щоб майстер почав збирати, внесіть передоплату ${d.pay.amount} грн.`);
+        setPending({ ...d.pay, at: Date.now() });
+        showPay(d.pay, $('#paybox'), $('#paytext'), $('#paybtn'));
+      } else {
+        show('Замовлення надіслано', 'Дякуємо! Замовлення вже у нас. Майстер зв’яжеться з вами найближчим часом і надішле фото підібраних каменів.');
+      }
       toast('Замовлення надіслано');
       cart = []; saveCart(); renderCart(); $('#recap').hidden = false;
     })
     .catch(() => { err.textContent = 'Не вдалося надіслати автоматично. Скопіюйте текст нижче і надішліть нам у Direct.'; show('Замовлення сформовано'); })
     .finally(() => { btn.disabled = false; btn.textContent = 'Надіслати замовлення'; });
 });
+/* ---------- prepayment through LiqPay (switched on in the worker settings) ---------- */
+const PAY_KEY = 'airchains-pay-v1';
+function getPending() { try { const p = JSON.parse(localStorage.getItem(PAY_KEY) || 'null'); return p && Date.now() - p.at < 3 * 864e5 ? p : null; } catch (e) { return null; } }
+function setPending(p) { try { if (p) localStorage.setItem(PAY_KEY, JSON.stringify(p)); else localStorage.removeItem(PAY_KEY); } catch (e) {} renderPending(); }
+// LiqPay checkout is a plain form POST of data + signature to their page
+function goPay(p) {
+  const f = el('form', { method: 'POST', action: p.url, acceptCharset: 'utf-8' });
+  f.append(el('input', { type: 'hidden', name: 'data', value: p.data }), el('input', { type: 'hidden', name: 'signature', value: p.signature }));
+  document.body.append(f); f.submit();
+}
+function showPay(p, box, text, btn) {
+  box.hidden = false;
+  text.textContent = `Передоплата ${p.amount} грн`;
+  btn.textContent = `Сплатити ${p.amount} грн`;
+  btn.onclick = () => goPay(p);
+}
+function renderPending() {
+  const p = getPending(), box = $('#pendingpay');
+  box.hidden = !p;
+  if (p) { showPay(p, box, $('#pendingtext'), $('#pendingbtn')); $('#pendingtext').textContent = `Ваше замовлення чекає на передоплату ${p.amount} грн`; }
+}
+$('#pendingdone').addEventListener('click', () => { setPending(null); toast('Дякуємо! Майстер перевірить оплату'); });
+renderPending();
 if (ORDER_ENDPOINT) {
+  // the worker says whether prepayment is switched on and how much it is
+  fetch(ORDER_ENDPOINT).then(r => r.json()).then(d => {
+    if (!d.payments) return;
+    $('#f-note-send').textContent = `Після оформлення потрібна передоплата ${d.prepay} грн онлайн: карткою, Apple Pay або Google Pay. Решту суми ви сплачуєте пізніше, як домовитеся з майстром.`;
+  }).catch(() => {});
   $('#f-submit').textContent = 'Надіслати замовлення';
   $('#f-note-send').textContent = 'Замовлення одразу прийде майстру. Ми напишемо або зателефонуємо вам, щоб підтвердити деталі.';
 }
@@ -1791,6 +1836,11 @@ $('#homeStones').replaceChildren(...STONES.slice(0, 8).map(s => el('a', { classN
 /* ---------- sections: #home, #constructor, #bracelets, #stones, #info ---------- */
 const VIEWS = ['home', 'constructor', 'bracelets', 'stones', 'info', 'cart'];
 function route() {
+  if (location.hash === '#paid') {
+    setPending(null);
+    window.history.replaceState(null, '', '#cart');
+    toast('Дякуємо за оплату! Майстер звʼяжеться з вами найближчим часом');
+  }
   const id = decodeURIComponent(location.hash.slice(1)) || 'home';
   let view = VIEWS.includes(id) ? id : null, target = null;
   if (!view) { const t = document.getElementById(id), v = t && t.closest('.view'); if (v) { view = v.dataset.view; target = t; } }

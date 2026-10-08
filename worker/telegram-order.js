@@ -7,6 +7,12 @@
 //   CHAT_ID         where orders go (the owner's Telegram chat id)
 //   ALLOWED_ORIGIN  the website address, e.g. https://diinliy.github.io
 //   ADMIN_KEY       secret, the password for the admin page
+// Prepayment through LiqPay (optional: without the two keys orders are taken without payment):
+//   LIQPAY_PUBLIC   public key of the LiqPay shop
+//   LIQPAY_PRIVATE  secret, private key of the LiqPay shop
+//   PREPAY_UAH      prepayment per order in hryvnias, 200 if not set
+//   SITE_URL        where LiqPay sends the buyer back, e.g. https://diinliy.github.io/air_chains/
+//   LIQPAY_SANDBOX  "1" while testing: LiqPay simulates the payment and no money moves
 // Binding (Worker → Settings → Bindings):
 //   ORDERS          a KV namespace where orders are stored (optional: without it orders only go to Telegram)
 
@@ -81,24 +87,72 @@ async function sendPhoto(env, dataUrl, caption) {
   return d.ok ? d.result.message_id : 0;
 }
 
+/* ---------- LiqPay ---------- */
+const payOn = env => !!(env.LIQPAY_PUBLIC && env.LIQPAY_PRIVATE);
+const prepayAmount = env => Math.max(1, Math.round(Number(env.PREPAY_UAH) || 200));
+const bytesToB64 = bytes => { let s = ''; for (const b of bytes) s += String.fromCharCode(b); return btoa(s); };
+const b64ToText = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64), ch => ch.charCodeAt(0)));
+// LiqPay signature: base64(sha1(private_key + data + private_key))
+async function liqSign(env, data) {
+  const digest = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(env.LIQPAY_PRIVATE + data + env.LIQPAY_PRIVATE));
+  return bytesToB64(new Uint8Array(digest));
+}
+async function liqCheckout(env, origin, id, name) {
+  const params = {
+    version: 3, public_key: env.LIQPAY_PUBLIC, action: 'pay', amount: prepayAmount(env), currency: 'UAH',
+    description: `Передоплата за замовлення Air Chains${name ? ', ' + name : ''}`, order_id: id,
+    server_url: origin + '/liqpay', language: 'uk',
+  };
+  if (env.SITE_URL) params.result_url = env.SITE_URL.replace(/#.*$/, '') + '#paid';
+  if (env.LIQPAY_SANDBOX === '1') params.sandbox = 1;
+  const data = bytesToB64(new TextEncoder().encode(JSON.stringify(params)));
+  return { url: 'https://www.liqpay.ua/api/3/checkout', data, signature: await liqSign(env, data), amount: params.amount };
+}
+// LiqPay calls this after a payment; the signature proves the call came from LiqPay
+async function handleLiqpay(request, env) {
+  if (!payOn(env)) return new Response('payments off', { status: 404 });
+  const form = await request.formData().catch(() => null);
+  const data = form && form.get('data'), signature = form && form.get('signature');
+  if (!data || !signature || !sameText(String(signature), await liqSign(env, String(data)))) return new Response('bad signature', { status: 400 });
+  const info = JSON.parse(b64ToText(String(data)));
+  if (!['success', 'sandbox'].includes(info.status)) return new Response('ok');
+  const id = String(info.order_id || '');
+  let order = null;
+  if (env.ORDERS && /^[0-9]{13}-[a-z0-9]{1,8}$/.test(id)) order = JSON.parse(await env.ORDERS.get('o:' + id) || 'null');
+  if (order && order.prepay && order.prepay.status === 'paid') return new Response('ok'); // LiqPay may call twice
+  if (order) {
+    order.prepay = { amount: info.amount, status: 'paid', at: new Date().toISOString(), test: info.status === 'sandbox' };
+    await env.ORDERS.put('o:' + id, JSON.stringify(order), { metadata: metaOf(order) });
+  }
+  const message = {
+    chat_id: env.CHAT_ID,
+    text: `✅ Передоплату ${info.amount} ${info.currency || 'UAH'} отримано${info.status === 'sandbox' ? ' (тестовий режим, без списання грошей)' : ''}\n${order ? `${order.name}, ${order.phone}` : 'Замовлення ' + id}`,
+  };
+  if (order && order.tgPhoto) message.reply_parameters = { message_id: order.tgPhoto, allow_sending_without_reply: true };
+  await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(message) });
+  return new Response('ok');
+}
+
+const metaOf = o => ({ t: o.createdAt, st: o.status, n: o.name, p: o.phone, s: o.total, b: o.beads, img: o.hasImage ? 1 : 0, pay: o.prepay ? (o.prepay.status === 'paid' ? 'p' : 'w') : '' });
+
 // Keys sort newest first: o:<reversed time>-<random>
 function newId() {
   const rev = String(9_999_999_999_999 - Date.now()).padStart(13, '0');
   return rev + '-' + Math.random().toString(36).slice(2, 6);
 }
 
-async function saveOrder(env, body, text) {
+async function saveOrder(env, body, text, id, photoId, pay) {
   if (!env.ORDERS) return;
-  const id = newId();
   const m = body.meta && typeof body.meta === 'object' ? body.meta : {};
   const order = {
     id, createdAt: new Date().toISOString(), status: 'new', text,
     name: clip(m.name, 80), phone: clip(m.phone, 40), contact: clip(m.contact, 80),
     total: clip(m.total, 20), beads: clip(m.beads, 40),
     hasImage: /^data:image\/(jpeg|png);base64,/.test(body.image || '') && body.image.length <= MAX_IMAGE,
+    tgPhoto: photoId || 0,
+    prepay: pay ? { amount: pay.amount, status: 'waiting' } : null,
   };
-  const meta = { t: order.createdAt, st: 'new', n: order.name, p: order.phone, s: order.total, b: order.beads, img: order.hasImage ? 1 : 0 };
-  await env.ORDERS.put('o:' + id, JSON.stringify(order), { metadata: meta });
+  await env.ORDERS.put('o:' + id, JSON.stringify(order), { metadata: metaOf(order) });
   if (order.hasImage) await env.ORDERS.put('i:' + id, body.image);
 }
 
@@ -132,8 +186,7 @@ async function handleAdmin(request, env, url, cors) {
     const body = await request.json().catch(() => ({}));
     if (!STATUSES.includes(body.status)) return json({ ok: false, error: 'bad_status' }, 400, cors);
     order.status = body.status;
-    const meta = { t: order.createdAt, st: order.status, n: order.name, p: order.phone, s: order.total, b: order.beads, img: order.hasImage ? 1 : 0 };
-    await env.ORDERS.put('o:' + id, JSON.stringify(order), { metadata: meta });
+    await env.ORDERS.put('o:' + id, JSON.stringify(order), { metadata: metaOf(order) });
     return json({ ok: true, order }, 200, cors);
   }
   if (request.method === 'DELETE') {
@@ -157,9 +210,10 @@ export default {
     };
     if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
 
+    if (url.pathname === '/liqpay' && request.method === 'POST') return handleLiqpay(request, env);
     if (url.pathname.startsWith('/orders')) return handleAdmin(request, env, url, cors);
 
-    if (request.method === 'GET') return json({ ok: true, service: 'air-chains-orders', storage: !!env.ORDERS }, 200, cors);
+    if (request.method === 'GET') return json({ ok: true, service: 'air-chains-orders', storage: !!env.ORDERS, payments: payOn(env), prepay: payOn(env) ? prepayAmount(env) : 0 }, 200, cors);
     if (request.method !== 'POST') return json({ ok: false, error: 'method' }, 405, cors);
     if (allowed.length && !allowed.includes(origin)) return json({ ok: false, error: 'origin' }, 403, cors);
     if (!env.BOT_TOKEN || !env.CHAT_ID) return json({ ok: false, error: 'not_configured' }, 500, cors);
@@ -173,8 +227,10 @@ export default {
 
     // picture first, then the full order as a reply to it; the text still goes out if the picture fails
     const summary = String(body.summary || '').slice(0, 200);
-    const photoId = await sendPhoto(env, body.image, '🛍 Нове замовлення з сайту' + (summary ? '\n' + summary : ''));
-    const parts = splitText((photoId ? '' : '🛍 Нове замовлення з сайту\n\n') + text);
+    const id = newId(), m = body.meta && typeof body.meta === 'object' ? body.meta : {};
+    const pay = payOn(env) ? await liqCheckout(env, url.origin, id, clip(m.name, 60)) : null;
+    const photoId = await sendPhoto(env, body.image, '🛍 Нове замовлення з сайту' + (summary ? '\n' + summary : '') + (pay ? `\n💳 Передоплата ${pay.amount} грн: очікуємо` : ''));
+    const parts = splitText((photoId ? '' : '🛍 Нове замовлення з сайту\n\n') + text + (pay ? `\n\n💳 Передоплата ${pay.amount} грн через LiqPay: очікуємо оплату. Коли клієнт заплатить, прийде окреме повідомлення.` : ''));
     let data = { ok: true };
     for (let i = 0; i < parts.length && data.ok; i++) {
       const message = { chat_id: env.CHAT_ID, text: (i ? `(продовження ${i + 1}/${parts.length})\n\n` : '') + parts[i], disable_web_page_preview: true };
@@ -188,9 +244,9 @@ export default {
     }
 
     // keep the order for the admin page even if Telegram failed, so nothing is lost
-    try { await saveOrder(env, body, text); } catch (e) { /* storage problems must not block the order */ }
+    try { await saveOrder(env, body, text, id, photoId, pay); } catch (e) { /* storage problems must not block the order */ }
 
     if (!data.ok) return json({ ok: false, error: 'telegram' }, 502, cors);
-    return json({ ok: true }, 200, cors);
+    return json({ ok: true, id, pay }, 200, cors);
   },
 };
