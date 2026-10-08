@@ -285,6 +285,13 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .field textarea { min-height: 84px; resize: vertical; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .err { color: var(--warn); font-size: 13px; min-height: 18px; }
+.paychoice { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+.paychoice legend { font-size: 13px; font-weight: 600; margin-bottom: 6px; padding: 0; }
+.payopt { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); cursor: pointer; }
+.payopt:has(input:checked) { border-color: var(--btn); box-shadow: 0 0 0 1px var(--btn) inset; }
+.payopt input { accent-color: var(--btn); width: 18px; height: 18px; margin: 2px 0 0; }
+.payopt b { display: block; font-weight: 600; }
+.payopt small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
 .paybox { display: grid; gap: 10px; padding: 16px; border-radius: 14px; border: 1px solid var(--btn); background: color-mix(in srgb, var(--btn) 7%, var(--surface)); }
 .paybox p:first-child { font-weight: 600; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
@@ -539,6 +546,12 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
           </div>
           <div class="field"><label for="f-city">Місто і номер відділення</label><input id="f-city" placeholder="Львів, №12"></div>
         </div>
+        <fieldset class="paychoice" id="paychoice">
+          <legend>Оплата</legend>
+          <label class="payopt"><input type="radio" name="pay" value="cod" checked><span><b>Накладений платіж</b><small>Оплата при отриманні на пошті. Пошта бере невелику комісію за переказ.</small></span></label>
+          <label class="payopt"><input type="radio" name="pay" value="prepay"><span><b>Передоплата <span class="prepaysum">200</span> грн</b><small id="prepaynote">Решту суми сплачуєте при отриманні.</small></span></label>
+          <label class="payopt"><input type="radio" name="pay" value="full"><span><b>Повна оплата <span id="fullsum"></span></b><small id="fullnote">Оплата всієї суми на рахунок ФОП.</small></span></label>
+        </fieldset>
         <div class="field"><label for="f-contact">Telegram або Instagram для зв’язку <span style="font-weight:400;color:var(--muted)">(необов’язково)</span></label><input id="f-contact" placeholder="@nickname"></div>
         <div class="hp" aria-hidden="true"><label for="f-website">Не заповнюйте це поле</label><input id="f-website" tabindex="-1" autocomplete="off"></div>
         <div class="field"><label for="f-note">Коментар</label><textarea id="f-note" placeholder="Наприклад: хочу місячний камінь з сильнішим сяйвом"></textarea></div>
@@ -1606,6 +1619,22 @@ function renderCart() {
   }
   recapcv._redraw = () => renderCart();
   updateBadges();
+  renderPayChoice();
+}
+const PAY_NAMES = { cod: 'Накладений платіж', prepay: 'Передоплата', full: 'Повна оплата' };
+let onlinePay = false, prepaySum = 200;
+const payMethod = () => (document.querySelector('input[name="pay"]:checked') || {}).value || 'cod';
+function payLine() {
+  const m = payMethod();
+  if (m === 'cod') return 'Оплата: накладений платіж (при отриманні)';
+  if (m === 'prepay') return `Оплата: передоплата ${prepaySum} грн, решта при отриманні`;
+  return `Оплата: повна оплата ${uah(cartTotal())} на рахунок ФОП`;
+}
+function renderPayChoice() {
+  $('#fullsum').textContent = cart.length ? uah(cartTotal()) : '';
+  document.querySelectorAll('.prepaysum').forEach(e => { e.textContent = prepaySum; });
+  $('#prepaynote').textContent = onlinePay ? 'Зараз онлайн карткою, Apple Pay або Google Pay. Решту сплачуєте при отриманні.' : 'Реквізити для оплати майстер надішле після замовлення. Решту сплачуєте при отриманні.';
+  $('#fullnote').textContent = onlinePay ? 'Вся сума зараз онлайн карткою, Apple Pay або Google Pay.' : 'Реквізити ФОП для оплати майстер надішле після замовлення.';
 }
 function orderText() {
   const v = id => $(id).value.trim();
@@ -1618,7 +1647,7 @@ function orderText() {
       ...priceLines().map(([a, p]) => `· ${a}: ${uah(p)}`),
       `Ціна: ${uah(price)}${b.qty > 1 ? ` × ${b.qty} = ${uah(price * b.qty)}` : ''}`, '');
   }));
-  out.push(`Разом: ${uah(cartTotal())}`, '',
+  out.push(`Разом: ${uah(cartTotal())}`, payLine(), '',
     `Ім’я: ${v('#f-name')}`, `Телефон: ${v('#f-phone')}`, `Доставка: ${$('#f-ship').value}, ${v('#f-city') || 'не вказано'}`,
     v('#f-contact') ? `Зв’язок: ${v('#f-contact')}` : '', v('#f-note') ? `Коментар: ${v('#f-note')}` : '');
   return out.filter((l, i, a) => !(l === '' && a[i - 1] === '')).join('\n').trim();
@@ -1642,15 +1671,18 @@ $('#form').addEventListener('submit', e => {
   };
   if (!ORDER_ENDPOINT) { show('Замовлення сформовано'); return; }
   const btn = $('#f-submit'); btn.disabled = true; btn.textContent = 'Надсилаємо…';
-  fetch(ORDER_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, image: cartPhoto(), summary: `${$('#f-name').value.trim()}, ${$('#f-phone').value.trim()} · ${count} ${plural(count, 'браслет', 'браслети', 'браслетів')} · ${uah(sum)}`, meta: { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), contact: $('#f-contact').value.trim(), total: uah(sum), beads: `${count} ${plural(count, 'браслет', 'браслети', 'браслетів')}` }, website: $('#f-website').value }) })
+  fetch(ORDER_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, image: cartPhoto(), summary: `${$('#f-name').value.trim()}, ${$('#f-phone').value.trim()} · ${count} ${plural(count, 'браслет', 'браслети', 'браслетів')} · ${uah(sum)}`, payMethod: payMethod(), amount: sum, meta: { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), contact: $('#f-contact').value.trim(), total: uah(sum), beads: `${count} ${plural(count, 'браслет', 'браслети', 'браслетів')}` }, website: $('#f-website').value }) })
     .then(r => r.json().catch(() => ({})).then(d => { if (!r.ok || !d.ok) throw new Error(d.error || r.status); return d; }))
     .then(d => {
+      const m = payMethod();
       if (d.pay) {
-        show('Замовлення прийнято', `Дякуємо! Замовлення вже у нас. Щоб майстер почав збирати, внесіть передоплату ${d.pay.amount} грн.`);
+        show('Замовлення прийнято', m === 'full' ? `Дякуємо! Замовлення вже у нас. Залишилось сплатити ${d.pay.amount} грн.` : `Дякуємо! Замовлення вже у нас. Щоб майстер почав збирати, внесіть передоплату ${d.pay.amount} грн.`);
         setPending({ ...d.pay, at: Date.now() });
         showPay(d.pay, $('#paybox'), $('#paytext'), $('#paybtn'));
+      } else if (m === 'cod') {
+        show('Замовлення надіслано', 'Дякуємо! Замовлення вже у нас. Оплата при отриманні на пошті. Майстер зв’яжеться з вами найближчим часом і надішле фото підібраних каменів.');
       } else {
-        show('Замовлення надіслано', 'Дякуємо! Замовлення вже у нас. Майстер зв’яжеться з вами найближчим часом і надішле фото підібраних каменів.');
+        show('Замовлення надіслано', `Дякуємо! Замовлення вже у нас. Майстер зв’яжеться з вами найближчим часом і надішле реквізити для оплати (${m === 'full' ? uah(sum) : prepaySum + ' грн'}).`);
       }
       toast('Замовлення надіслано');
       cart = []; saveCart(); renderCart(); $('#recap').hidden = false;
@@ -1685,7 +1717,7 @@ if (ORDER_ENDPOINT) {
   // the worker says whether prepayment is switched on and how much it is
   fetch(ORDER_ENDPOINT).then(r => r.json()).then(d => {
     if (!d.payments) return;
-    $('#f-note-send').textContent = `Після оформлення потрібна передоплата ${d.prepay} грн онлайн: карткою, Apple Pay або Google Pay. Решту суми ви сплачуєте пізніше, як домовитеся з майстром.`;
+    onlinePay = true; prepaySum = d.prepay || prepaySum; renderPayChoice();
   }).catch(() => {});
   $('#f-submit').textContent = 'Надіслати замовлення';
   $('#f-note-send').textContent = 'Замовлення одразу прийде майстру. Ми напишемо або зателефонуємо вам, щоб підтвердити деталі.';

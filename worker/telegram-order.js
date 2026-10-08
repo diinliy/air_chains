@@ -97,10 +97,10 @@ async function liqSign(env, data) {
   const digest = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(env.LIQPAY_PRIVATE + data + env.LIQPAY_PRIVATE));
   return bytesToB64(new Uint8Array(digest));
 }
-async function liqCheckout(env, origin, id, name) {
+async function liqCheckout(env, origin, id, name, amount, full) {
   const params = {
-    version: 3, public_key: env.LIQPAY_PUBLIC, action: 'pay', amount: prepayAmount(env), currency: 'UAH',
-    description: `Передоплата за замовлення Air Chains${name ? ', ' + name : ''}`, order_id: id,
+    version: 3, public_key: env.LIQPAY_PUBLIC, action: 'pay', amount, currency: 'UAH',
+    description: `${full ? 'Оплата' : 'Передоплата за'} замовлення Air Chains${name ? ', ' + name : ''}`, order_id: id,
     server_url: origin + '/liqpay', language: 'uk',
   };
   if (env.SITE_URL) params.result_url = env.SITE_URL.replace(/#.*$/, '') + '#paid';
@@ -228,9 +228,17 @@ export default {
     // picture first, then the full order as a reply to it; the text still goes out if the picture fails
     const summary = String(body.summary || '').slice(0, 200);
     const id = newId(), m = body.meta && typeof body.meta === 'object' ? body.meta : {};
-    const pay = payOn(env) ? await liqCheckout(env, url.origin, id, clip(m.name, 60)) : null;
-    const photoId = await sendPhoto(env, body.image, '🛍 Нове замовлення з сайту' + (summary ? '\n' + summary : '') + (pay ? `\n💳 Передоплата ${pay.amount} грн: очікуємо` : ''));
-    const parts = splitText((photoId ? '' : '🛍 Нове замовлення з сайту\n\n') + text + (pay ? `\n\n💳 Передоплата ${pay.amount} грн через LiqPay: очікуємо оплату. Коли клієнт заплатить, прийде окреме повідомлення.` : ''));
+    // payment the buyer chose: cash on delivery, prepayment or the full amount
+    const method = ['cod', 'prepay', 'full'].includes(body.payMethod) ? body.payMethod : 'cod';
+    const fullSum = Math.max(1, Math.round(Number(body.amount) || 0));
+    const due = method === 'full' ? fullSum : method === 'prepay' ? prepayAmount(env) : 0;
+    const pay = due && payOn(env) ? await liqCheckout(env, url.origin, id, clip(m.name, 60), due, method === 'full') : null;
+    const what = method === 'full' ? 'Повна оплата' : 'Передоплата';
+    const payNote = !due ? '\n\n🚚 Накладений платіж: оплата при отриманні.'
+      : pay ? `\n\n💳 ${what} ${due} грн через LiqPay: очікуємо оплату. Коли клієнт заплатить, прийде окреме повідомлення.`
+      : `\n\n💳 Клієнт обрав: ${what.toLowerCase()} ${due} грн. Надішліть йому реквізити для оплати.`;
+    const photoId = await sendPhoto(env, body.image, '🛍 Нове замовлення з сайту' + (summary ? '\n' + summary : '') + (due ? `\n💳 ${what} ${due} грн` : '\n🚚 Накладений платіж'));
+    const parts = splitText((photoId ? '' : '🛍 Нове замовлення з сайту\n\n') + text + payNote);
     let data = { ok: true };
     for (let i = 0; i < parts.length && data.ok; i++) {
       const message = { chat_id: env.CHAT_ID, text: (i ? `(продовження ${i + 1}/${parts.length})\n\n` : '') + parts[i], disable_web_page_preview: true };
