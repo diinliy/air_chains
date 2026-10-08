@@ -5,18 +5,19 @@
 <style>
 /* Layout: a jeweller's bead board (dark flocked tray with a cm ruler) beside a control column; catalogue and reference sections below. */
 :root {
-  --bg: #EDEFEC;
-  --surface: #F8F9F7;
+  --bg: #F6F6F3;
+  --surface: #FFFFFF;
   --ink: #1C2321;
   --muted: #59645F;
-  --line: #D2D8D4;
+  --line: #E0E3DF;
   --accent: #7A5B22;
   --accent-ink: #FFFFFF;
-  --accent-soft: #E7DFCC;
+  --accent-soft: #EFE7D6;
   --ok: #2E7A4D;
   --warn: #A4521A;
-  --board: #1E2A26;
-  --board-ink: #E9EFEB;
+  --bd-1: #FFFFFF; --bd-2: #E6E8E4; --bd-groove: rgba(30,40,36,.055); --bd-rim: rgba(30,40,36,.07); --bd-tick: rgba(30,40,36,.34); --bd-tick-soft: rgba(30,40,36,.16);
+  --bd-label: rgba(30,40,36,.5); --bd-cord: rgba(70,64,56,.42); --bd-ink: #1B1F1D; --bd-ink-soft: rgba(27,31,29,.6); --bd-sel: #9A7430; --bd-shadow: rgba(50,45,30,.3); --bd-mode: light;
+  --hud-bg: rgba(255,255,255,.86); --hud-line: rgba(30,40,36,.1); --hud-ink: #1B1F1D; --hud-add: #99560F; --hud-ok: #2E7A4D; --hud-warn: #B4431F;
   --display: "Forum", "Cormorant Garamond", "Times New Roman", serif;
   --body: "Manrope", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -25,13 +26,19 @@
   :root:not([data-theme="light"]) {
     --bg: #111614; --surface: #18201D; --ink: #E5EBE7; --muted: #95A29C; --line: #2A3430;
     --accent: #D3AF6B; --accent-ink: #1A1408; --accent-soft: #3A3223; --ok: #7CC79A; --warn: #E59B60;
-    --board: #1A2420; --board-ink: #E9EFEB; color-scheme: dark;
+    --bd-1: #2B3A35; --bd-2: #16201C; --bd-groove: rgba(0,0,0,.28); --bd-rim: rgba(255,255,255,.05); --bd-tick: rgba(233,239,235,.45); --bd-tick-soft: rgba(233,239,235,.22);
+    --bd-label: rgba(233,239,235,.5); --bd-cord: rgba(236,230,218,.5); --bd-ink: #E9EFEB; --bd-ink-soft: rgba(233,239,235,.65); --bd-sel: #E8CB8A; --bd-shadow: rgba(0,0,0,.5); --bd-mode: dark;
+    --hud-bg: rgba(16,24,21,.74); --hud-line: rgba(255,255,255,.12); --hud-ink: #E9EFEB; --hud-add: #F6C38F; --hud-ok: #9BDDB2; --hud-warn: #F4A08A;
+    color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #111614; --surface: #18201D; --ink: #E5EBE7; --muted: #95A29C; --line: #2A3430;
   --accent: #D3AF6B; --accent-ink: #1A1408; --accent-soft: #3A3223; --ok: #7CC79A; --warn: #E59B60;
-  --board: #1A2420; --board-ink: #E9EFEB; color-scheme: dark;
+  --bd-1: #2B3A35; --bd-2: #16201C; --bd-groove: rgba(0,0,0,.28); --bd-rim: rgba(255,255,255,.05); --bd-tick: rgba(233,239,235,.45); --bd-tick-soft: rgba(233,239,235,.22);
+  --bd-label: rgba(233,239,235,.5); --bd-cord: rgba(236,230,218,.5); --bd-ink: #E9EFEB; --bd-ink-soft: rgba(233,239,235,.65); --bd-sel: #E8CB8A; --bd-shadow: rgba(0,0,0,.5); --bd-mode: dark;
+  --hud-bg: rgba(16,24,21,.74); --hud-line: rgba(255,255,255,.12); --hud-ink: #E9EFEB; --hud-add: #F6C38F; --hud-ok: #9BDDB2; --hud-warn: #F4A08A;
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -53,9 +60,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .nav { display: flex; gap: 22px; }
 .nav a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; }
 .nav a:hover { color: var(--ink); }
+.themebtn { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.themebtn svg { width: 18px; height: 18px; }
 .nav .ig { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
 .nav .ig svg { width: 20px; height: 20px; }
-@media (max-width: 760px) { .nav a:not(.keep) { display: none; } }
+@media (max-width: 760px) { .nav a:not(.keep) { display: none; } .nav { gap: 14px; align-items: center; } .logo { font-size: 23px; white-space: nowrap; } }
+.nav { align-items: center; }
 
 /* hero */
 .hero { padding-block: clamp(28px, 5vw, 56px) 28px; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 32px; align-items: end; }
@@ -71,11 +81,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* configurator */
 .cfg { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: start; padding-block: 8px 56px; }
 .stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); display: grid; gap: 12px; }
-.boardwrap { position: relative; width: 100%; max-width: 620px; aspect-ratio: 1; border-radius: 22px; overflow: hidden; background: var(--board); box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px -24px rgba(0,0,0,.6); }
+.boardwrap { position: relative; width: 100%; max-width: 620px; aspect-ratio: 1; border-radius: 22px; overflow: hidden; background: var(--bd-2); box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px -24px rgba(0,0,0,.45); }
 #board { width: 100%; height: 100%; display: block; touch-action: manipulation; cursor: pointer; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .hud { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; pointer-events: none; }
-.hud .chip { background: rgba(16,24,21,.74); border-color: rgba(255,255,255,.12); color: #E9EFEB; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); font-size: 12.5px; }
-.hud .chip.add { color: #F6C38F; } .hud .chip.ok { color: #9BDDB2; } .hud .chip.warn { color: #F4A08A; } .hud .chip.idle { color: #C9D2CD; }
+.hud .chip { background: var(--hud-bg); border-color: var(--hud-line); color: var(--hud-ink); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); font-size: 12.5px; }
+.hud .chip.add { color: var(--hud-add); } .hud .chip.ok { color: var(--hud-ok); } .hud .chip.warn { color: var(--hud-warn); } .hud .chip.idle { color: var(--hud-ink); }
 .hud .chip.total::before { display: none; }
 .statusrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; max-width: 620px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--surface); border: 1px solid var(--line); }
@@ -267,6 +277,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
 
+<script>try { document.documentElement.setAttribute('data-theme', localStorage.getItem('ac-theme') || 'light'); } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }</script>
 <header class="top">
   <div class="wrap">
     <a class="logo" href="#constructor" aria-label="Air Chains, на початок">
@@ -280,6 +291,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       <a href="#process">Як ми працюємо</a>
       <a href="#faq">Питання</a>
       <a class="keep ig" href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+      <button class="themebtn" id="theme" type="button" aria-label="Темна тема"></button>
     </nav>
   </div>
 </header>
@@ -531,7 +543,7 @@ const clone = it => ({ ...it });
    reflection, Fresnel rim, and light passing through translucent stones. */
 const sprites = new Map();
 function stoneSprite(id, v) {
-  const k = id + ':' + v;
+  const k = id + ':' + v + (id === 'crystal' && T.light ? ':l' : '');
   if (!sprites.has(k)) sprites.set(k, paintStone(STONE[id], v));
   return sprites.get(k);
 }
@@ -705,7 +717,8 @@ function paintStone(st, v) {
       } else if (M.clear) {
         const inv = smooth(-0.4, 0.9, ny * 0.75 + nx * 0.4);
         const edge = Math.pow(1 - nz, 1.6) * 0.55;
-        r = (0.17 + 0.42 * inv * o[0]) * (1 - edge); gg = (0.21 + 0.42 * inv * o[1]) * (1 - edge); b = (0.2 + 0.42 * inv * o[2]) * (1 - edge);
+        const bb = T.light ? [0.8, 0.82, 0.82] : [0.17, 0.21, 0.2], ib = T.light ? 0.16 : 0.42;
+        r = (bb[0] + ib * inv * o[0]) * (1 - edge); gg = (bb[1] + ib * inv * o[1]) * (1 - edge); b = (bb[2] + ib * inv * o[2]) * (1 - edge);
         const veil = o[4] * (0.5 + 0.5 * Math.max(0, ndl)); r += (0.95 - r) * veil; gg += (0.96 - gg) * veil; b += (0.97 - b) * veil;
         const caustic = Math.pow(clamp01(0.5 + 0.5 * (nx * 0.6 + ny * 0.68)), 6) * (0.4 + 0.6 * nz) * 0.6;
         r += caustic; gg += caustic; b += caustic;
@@ -766,6 +779,12 @@ function charmSprite(id, metal) {
 }
 
 /* ---------- board drawing ---------- */
+let T = {};
+function readTheme() {
+  const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue('--bd-' + n).trim();
+  T = { b1: g('1'), b2: g('2'), groove: g('groove'), rim: g('rim'), tick: g('tick'), tickSoft: g('tick-soft'), label: g('label'), cord: g('cord'), ink: g('ink'), inkSoft: g('ink-soft'), sel: g('sel'), shadow: g('shadow'), light: g('mode') !== 'dark' };
+}
+readTheme();
 const board = $('#board'), boardWrap = $('#boardwrap');
 let boardPx = 0, dpr = 1, geo = null, drag = null;
 let noise = null;
@@ -794,12 +813,12 @@ function drawItem(ctx, G, o, x, y, alpha = 1) {
   ctx.save(); ctx.globalAlpha = alpha;
   if (it.k === 's') {
     const px = it.d * ppm;
-    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = px * 0.2; ctx.shadowOffsetX = px * 0.05; ctx.shadowOffsetY = px * 0.1;
+    ctx.shadowColor = T.shadow; ctx.shadowBlur = px * 0.2; ctx.shadowOffsetX = px * 0.05; ctx.shadowOffsetY = px * 0.1;
     ctx.drawImage(stoneSprite(it.id, it.v), x - px / 2, y - px / 2, px, px);
   } else if (it.k === 'sp') {
     const M = METALS[state.metal].c, h = Math.min(d * 0.82, 6.5), w = 2.6;
     ctx.translate(x, y); ctx.rotate(o.a); ctx.scale(ppm, ppm);
-    ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 2;
+    ctx.shadowColor = T.shadow; ctx.shadowBlur = 4; ctx.shadowOffsetY = 2;
     const lg = ctx.createLinearGradient(0, -w / 2, 0, w / 2);
     lg.addColorStop(0, M[2]); lg.addColorStop(0.35, M[0]); lg.addColorStop(0.7, M[1]); lg.addColorStop(1, M[2]);
     ctx.fillStyle = lg; rrect(ctx, -h / 2, -w / 2, h, w, 0.9); ctx.fill();
@@ -809,7 +828,7 @@ function drawItem(ctx, G, o, x, y, alpha = 1) {
     ctx.strokeStyle = M[1]; ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, d / 2 + 2.2); ctx.stroke();
     ctx.lineWidth = 0.55; ctx.beginPath(); ctx.arc(0, d / 2 + 3.2, 1.1, 0, 7); ctx.stroke();
-    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3;
+    ctx.shadowColor = T.shadow; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3;
     ctx.drawImage(charmSprite(it.id, state.metal), -6, d / 2 + 4.2, 12, 12);
   }
   ctx.restore();
@@ -820,28 +839,29 @@ function drawBoard(canvas, S, opts = {}) {
   ctx.setTransform(k, 0, 0, k, 0, 0);
   const G = geometry(S);
   const bg = ctx.createRadialGradient(S * 0.45, S * 0.4, S * 0.1, S / 2, S / 2, S * 0.75);
-  bg.addColorStop(0, '#2B3A35'); bg.addColorStop(1, '#16201C');
+  bg.addColorStop(0, T.b1); bg.addColorStop(1, T.b2);
   ctx.fillStyle = bg; ctx.fillRect(0, 0, S, S);
-  ctx.fillStyle = noisePattern(ctx); ctx.fillRect(0, 0, S, S);
+  ctx.globalAlpha = T.light ? 0.25 : 1; ctx.fillStyle = noisePattern(ctx); ctx.fillRect(0, 0, S, S); ctx.globalAlpha = 1;
+  if (T.light) { ctx.strokeStyle = T.rim; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(S / 2, S / 2, S * 0.475, 0, Math.PI * 2); ctx.stroke(); }
   const { cx, cy, R, ppm, tgt } = G;
   // groove
   const gw = Math.max(maxD() * ppm + 10, 18);
-  ctx.strokeStyle = 'rgba(0,0,0,.28)'; ctx.lineWidth = gw; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
-  ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(cx, cy, R + gw / 2, 0, Math.PI * 2); ctx.stroke();
+  ctx.strokeStyle = T.groove; ctx.lineWidth = gw; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  ctx.strokeStyle = T.rim; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(cx, cy, R + gw / 2, 0, Math.PI * 2); ctx.stroke();
   // ruler
   if (!opts.mini) {
     const tr = R + gw / 2 + 8;
-    ctx.fillStyle = 'rgba(233,239,235,.5)'; ctx.font = `${Math.max(9, S * 0.019)}px "JetBrains Mono", monospace`;
+    ctx.fillStyle = T.label; ctx.font = `${Math.max(9, S * 0.019)}px "JetBrains Mono", monospace`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     for (let mm = 0; mm < tgt - 1; mm += 5) {
       const a = -Math.PI / 2 + mm * ppm / R, long = mm % 10 === 0, len = long ? 9 : 5;
-      ctx.strokeStyle = long ? 'rgba(233,239,235,.45)' : 'rgba(233,239,235,.22)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = long ? T.tick : T.tickSoft; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * tr, cy + Math.sin(a) * tr); ctx.lineTo(cx + Math.cos(a) * (tr + len), cy + Math.sin(a) * (tr + len)); ctx.stroke();
       if (mm % 20 === 0) { const lr = tr + len + S * 0.024; ctx.fillText(String(mm / 10), cx + Math.cos(a) * lr, cy + Math.sin(a) * lr); }
     }
   }
   // cord
-  ctx.strokeStyle = 'rgba(236,230,218,.5)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  ctx.strokeStyle = T.cord; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
   const pos = o => [cx + Math.cos(o.a) * R, cy + Math.sin(o.a) * R];
   const dragging = !opts.mini && drag && drag.moved ? drag.i : -1;
   G.lay.filter(o => o.it.k === 'ch').forEach(o => drawItem(ctx, G, o, ...pos(o), o.i === dragging ? 0.3 : 1));
@@ -850,7 +870,7 @@ function drawBoard(canvas, S, opts = {}) {
     // selection
     const so = G.lay[state.sel];
     if (so && dragging < 0) {
-      ctx.strokeStyle = '#E8CB8A'; ctx.lineWidth = 2;
+      ctx.strokeStyle = T.sel; ctx.lineWidth = 2;
       ctx.beginPath();
       if (so.it.k === 'ch') { const an = charmAnchor(G, so); ctx.arc(an.x, an.y, an.r + 4, 0, 7); }
       else { const [x, y] = pos(so); ctx.arc(x, y, Math.max(so.w, 5) / 2 * ppm + 4, 0, 7); }
@@ -860,14 +880,14 @@ function drawBoard(canvas, S, opts = {}) {
     if (dragging >= 0) {
       const t = dropTarget(G, drag.x, drag.y, dragging);
       // delete zone in the middle of the board
-      ctx.fillStyle = t.del ? 'rgba(214,92,70,.32)' : 'rgba(255,255,255,.035)';
-      ctx.strokeStyle = t.del ? 'rgba(240,140,120,.8)' : 'rgba(233,239,235,.25)'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]);
+      ctx.fillStyle = t.del ? 'rgba(214,92,70,.28)' : (T.light ? 'rgba(30,40,36,.03)' : 'rgba(255,255,255,.035)');
+      ctx.strokeStyle = t.del ? 'rgba(214,92,70,.8)' : T.tickSoft; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]);
       ctx.beginPath(); ctx.arc(cx, cy, R * 0.5, 0, 7); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = t.del ? '#FFE3DC' : 'rgba(233,239,235,.6)'; ctx.font = `500 ${S * 0.03}px Manrope, sans-serif`;
+      ctx.fillStyle = t.del ? (T.light ? '#8E2C14' : '#FFE3DC') : T.inkSoft; ctx.font = `500 ${S * 0.03}px Manrope, sans-serif`;
       ctx.fillText(t.del ? 'Відпустіть,' : 'Перетягніть сюди,', cx, cy - S * 0.008);
       ctx.fillText(t.del ? 'щоб видалити' : 'щоб видалити', cx, cy + S * 0.03);
       if (t.mark != null) {
-        ctx.strokeStyle = '#E8CB8A'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        ctx.strokeStyle = T.sel; ctx.lineWidth = 3; ctx.lineCap = 'round';
         const r0 = R - gw / 2 + 2, r1 = R + gw / 2 - 2;
         ctx.beginPath(); ctx.moveTo(cx + Math.cos(t.mark) * r0, cy + Math.sin(t.mark) * r0); ctx.lineTo(cx + Math.cos(t.mark) * r1, cy + Math.sin(t.mark) * r1); ctx.stroke();
       }
@@ -880,12 +900,12 @@ function drawBoard(canvas, S, opts = {}) {
     // centre readout
     const n = stoneCount();
     if (!state.items.length) {
-      ctx.fillStyle = 'rgba(233,239,235,.75)'; ctx.font = `${S * 0.05}px Forum, serif`;
+      ctx.fillStyle = T.inkSoft; ctx.font = `${S * 0.05}px Forum, serif`;
       ctx.fillText('Оберіть камінь,', cx, cy - S * 0.005);
       ctx.fillText('щоб почати', cx, cy + S * 0.05);
     } else {
-      ctx.fillStyle = '#E9EFEB'; ctx.font = `${S * 0.1}px Forum, serif`; ctx.fillText(String(n), cx, cy - S * 0.01);
-      ctx.fillStyle = 'rgba(233,239,235,.65)'; ctx.font = `500 ${S * 0.026}px Manrope, sans-serif`;
+      ctx.fillStyle = T.ink; ctx.font = `${S * 0.1}px Forum, serif`; ctx.fillText(String(n), cx, cy - S * 0.01);
+      ctx.fillStyle = T.inkSoft; ctx.font = `500 ${S * 0.026}px Manrope, sans-serif`;
       ctx.fillText(`${plural(n, 'бусина', 'бусини', 'бусин')} · ${sizesLabel()}`, cx, cy + S * 0.035);
       ctx.font = `${S * 0.024}px "JetBrains Mono", monospace`;
       ctx.fillText(`${cm(G.total)} / ${cm(tgt)} см`, cx, cy + S * 0.075);
@@ -1050,7 +1070,9 @@ function move(dir) {
 function swatch(id, px, v = 0) {
   const c = el('canvas'); const d = Math.min(window.devicePixelRatio || 1, 2);
   c.width = c.height = Math.round(px * d);
-  const g = c.getContext('2d'); g.drawImage(stoneSprite(id, v), 0, 0, c.width, c.height);
+  const g = c.getContext('2d');
+  c._redraw = () => { g.clearRect(0, 0, c.width, c.height); g.drawImage(stoneSprite(id, v), 0, 0, c.width, c.height); };
+  c._redraw();
   c.setAttribute('aria-hidden', 'true');
   return c;
 }
@@ -1151,7 +1173,8 @@ function buildAddons() {
 $('#presets').replaceChildren(...PRESETS.map(p => {
   const cv = el('canvas'); cv.width = 92; cv.height = 36;
   const g = cv.getContext('2d'); const ids = p.pattern.filter(x => x !== 'S').slice(0, 3);
-  ids.forEach((id, i) => g.drawImage(stoneSprite(id, i), 4 + i * 28, 2, 32, 32));
+  cv._redraw = () => { g.clearRect(0, 0, 92, 36); ids.forEach((id, i) => g.drawImage(stoneSprite(id, i), 4 + i * 28, 2, 32, 32)); };
+  cv._redraw();
   const b = el('button', { type: 'button', className: 'preset' }, [cv, p.name]);
   b.addEventListener('click', () => { commit(() => applyPreset(p)); toast(`Візерунок «${p.name}»`); });
   return b;
@@ -1358,6 +1381,18 @@ try {
 } catch (e) {}
 if (!loaded) applyPreset(PRESETS[0]);
 buildAddons();
+/* light / dark theme */
+const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
+const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>';
+function applyTheme(t, persist) {
+  document.documentElement.setAttribute('data-theme', t);
+  if (persist) { try { localStorage.setItem('ac-theme', t); } catch (e) {} }
+  const btn = $('#theme'); btn.innerHTML = t === 'dark' ? SUN : MOON; btn.setAttribute('aria-label', t === 'dark' ? 'Світла тема' : 'Темна тема');
+  readTheme();
+  document.querySelectorAll('canvas').forEach(c => c._redraw && c._redraw());
+}
+$('#theme').addEventListener('click', () => { applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true); render(); });
+applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light', false);
 /* mobile tabs: one step at a time under the board */
 function setTab(t, fromUser) {
   tab = t;
