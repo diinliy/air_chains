@@ -43,6 +43,16 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+.cta, .tbtn, .stone, .addon, .preset, .filters button, .colors button, .seg button, .card .add, .menubtn, .tabbar button, .linkbtn, .wheel button {
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .14s ease, box-shadow .2s ease, filter .2s ease;
+}
+:is(.cta, .tbtn, .stone, .addon, .preset, .filters button, .colors button, .seg button, .card .add, .tabbar button):active { transform: scale(.96); }
+@keyframes viewin { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes menuin { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .view:not([hidden]) { animation: viewin .4s cubic-bezier(.2, .7, .2, 1) both; }
+  body.menu-open .nav { animation: menuin .24s cubic-bezier(.2, .7, .2, 1) both; }
+}
 /* quick repeated taps (adding beads) must not trigger double-tap zoom; pinch zoom still works */
 html, body, button, a, input, select, textarea, label, canvas { touch-action: manipulation; }
 html { scroll-behavior: smooth; }
@@ -322,6 +332,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   body:not([data-view="constructor"]) .mbar, body:not([data-view="constructor"]) .tabbar { display: none; }
   .panel > [data-tab] { display: none; }
   .panel > [data-tab].on { display: grid; }
+  @media (prefers-reduced-motion: no-preference) { .panel > [data-tab].on { animation: viewin .28s cubic-bezier(.2, .7, .2, 1) both; } }
   .panel { min-height: 320px; align-content: start; }
 }
 .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 40; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; transition: opacity .2s, transform .2s; width: max-content; max-width: calc(100% - 32px); display: flex; gap: 14px; align-items: center; justify-content: space-between; }
@@ -982,16 +993,36 @@ function drawBoard(canvas, S, opts = {}) {
   ctx.strokeStyle = T.cord; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
   const pos = o => [cx + Math.cos(o.a) * R, cy + Math.sin(o.a) * R];
   const dragging = !opts.mini && !opts.photo && drag && drag.moved ? drag.i : -1;
-  G.lay.filter(o => o.it.k === 'ch').forEach(o => drawItem(ctx, G, o, ...pos(o), o.i === dragging ? 0.3 : 1));
-  G.lay.filter(o => o.it.k !== 'ch').forEach(o => drawItem(ctx, G, o, ...pos(o), o.i === dragging ? 0.3 : 1));
+  // on the live board every bead glides from where it was to its new place; new beads grow in
+  let moving = false;
+  const shown = G.lay.map(o => {
+    if (!opts.live || calmMotion.matches) return { o, a: o.a, s: 1 };
+    let m = motion.get(o.it);
+    if (!m) { m = { a: o.a, s: 0.35 }; motion.set(o.it, m); }
+    const da = normA(o.a - m.a);
+    m.a = Math.abs(da) < 0.002 ? o.a : m.a + da * 0.2;
+    m.s = 1 - m.s < 0.01 ? 1 : m.s + (1 - m.s) * 0.2;
+    if (m.a !== o.a || m.s !== 1) moving = true;
+    return { o, a: m.a, s: m.s };
+  });
+  const drawShown = ({ o, a, s }) => {
+    const x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.translate(-x, -y);
+    drawItem(ctx, G, { ...o, a }, x, y, (o.i === dragging ? 0.3 : 1) * s);
+    ctx.restore();
+  };
+  shown.filter(e => e.o.it.k === 'ch').forEach(drawShown);
+  shown.filter(e => e.o.it.k !== 'ch').forEach(drawShown);
+  if (moving) { cancelAnimationFrame(motionFrame); motionFrame = requestAnimationFrame(draw); }
   if (!opts.mini) {
     // selection
     const so = G.lay[state.sel];
     if (so && dragging < 0 && !opts.photo) {
       ctx.strokeStyle = T.sel; ctx.lineWidth = 2;
       ctx.beginPath();
-      if (so.it.k === 'ch') { const an = charmAnchor(G, so); ctx.arc(an.x, an.y, an.r + 4, 0, 7); }
-      else { const [x, y] = pos(so); ctx.arc(x, y, Math.max(so.w, 5) / 2 * ppm + 4, 0, 7); }
+      const sa = shown[state.sel].a;
+      if (so.it.k === 'ch') { const an = charmAnchor(G, { ...so, a: sa }); ctx.arc(an.x, an.y, an.r + 4, 0, 7); }
+      else { const [x, y] = pos({ a: sa }); ctx.arc(x, y, Math.max(so.w, 5) / 2 * ppm + 4, 0, 7); }
       ctx.stroke();
     }
     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
@@ -1031,7 +1062,9 @@ function drawBoard(canvas, S, opts = {}) {
   }
   return G;
 }
-function draw() { if (boardPx) geo = drawBoard(board, boardPx); }
+const motion = new WeakMap(), calmMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let motionFrame = 0;
+function draw() { if (boardPx) geo = drawBoard(board, boardPx, { live: true }); }
 function sizeBoard() {
   const w = boardWrap.clientWidth; if (!w) return;
   dpr = Math.min(window.devicePixelRatio || 1, 2);
