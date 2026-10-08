@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Build the standalone website (index.html at the repo root, served by GitHub Pages)
-from druza/index.html, which is the page body as published on claude.ai."""
+from src/index.html, which is the page body as published on claude.ai."""
 from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
-body = (root / "druza" / "index.html").read_text(encoding="utf-8")
+body = (root / "src" / "index.html").read_text(encoding="utf-8")
 head = (
     '<!doctype html><html lang="uk"><head><meta charset="utf-8">'
     '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'

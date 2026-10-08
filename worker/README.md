@@ -15,7 +15,7 @@ Cloudflare. Ніколи не додавайте його в код сайту: 
    - `ALLOWED_ORIGIN`, тип **Text**: `https://diinliy.github.io`;
    - `ADMIN_KEY`, тип **Secret**: пароль для сторінки замовлень.
 5. Скопіюйте адресу воркера (`https://air-chains-orders.<ваш-піддомен>.workers.dev`)
-   і впишіть її в `ORDER_ENDPOINT` у файлі `druza/index.html`, потім запустіть `python3 tools/build-site.py`.
+   і впишіть її в `ORDER_ENDPOINT` у файлі `src/index.html`, потім запустіть `python3 tools/build-site.py`.
 
 Перевірка: якщо відкрити адресу воркера в браузері, він має відповісти `{"ok":true,...}`.
 
@@ -27,12 +27,12 @@ Cloudflare. Ніколи не додавайте його в код сайту: 
 ## Сайт на GitHub Pages
 
 **Settings → Pages → Build and deployment**: Source **Deploy from a branch**, гілка з сайтом, папка `/ (root)`.
-Сайт буде за адресою https://diinliy.github.io/Orion/.
-Після змін у `druza/index.html` запустіть `python3 tools/build-site.py`: він оновить `index.html` у корені.
+Сайт буде за адресою https://diinliy.github.io/air_chains/.
+Після змін у `src/index.html` запустіть `python3 tools/build-site.py`: він оновить `index.html` у корені.
 
 ## Сторінка замовлень (адмінка)
 
-https://diinliy.github.io/Orion/admin/ показує всі замовлення: фото браслета, склад, контакти й статус.
+https://diinliy.github.io/air_chains/admin/ показує всі замовлення: фото браслета, склад, контакти й статус.
 Щоб замовлення зберігалися, підключіть до воркера сховище:
 
 1. **Storage & Databases → Workers KV → Create**, назва `air-chains-orders`.
