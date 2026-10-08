@@ -59,14 +59,32 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
 .logo { font-family: var(--display); font-size: 28px; letter-spacing: .02em; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 10px; }
 .logo svg { width: 22px; height: 22px; }
-.nav { display: flex; gap: 22px; }
+.top .wrap { gap: 20px; }
+.nav { display: flex; gap: 22px; margin-left: auto; }
+.nav a[aria-current="page"] { color: var(--ink); font-weight: 700; }
+.hdr { display: flex; gap: 10px; align-items: center; }
+.hdr .ig { display: inline-flex; color: var(--ink); }
+.hdr .ig svg { width: 20px; height: 20px; }
+.menubtn { display: none !important; }
+@media (max-width: 860px) {
+  .menubtn { display: inline-grid !important; }
+  .nav { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; margin: 0; padding: 4px clamp(16px, 4vw, 40px) 18px; background: var(--bg); border-bottom: 1px solid var(--line); box-shadow: 0 20px 30px -24px rgba(0,0,0,.35); }
+  body.menu-open .nav { display: flex; align-items: stretch; }
+  .nav a { text-align: left; }
+  .nav a { font: 400 26px/1.2 var(--display); color: var(--ink); padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .nav a:last-child { border-bottom: 0; }
+  .nav a[aria-current="page"] { color: var(--accent); font-weight: 400; }
+  .logo { font-size: 23px; white-space: nowrap; }
+  .top .wrap { position: static; }
+  .top { position: sticky; }
+}
 .nav a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; }
 .nav a:hover { color: var(--ink); }
 .themebtn { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
 .themebtn svg { width: 18px; height: 18px; }
 .nav .ig { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
 .nav .ig svg { width: 20px; height: 20px; }
-@media (max-width: 760px) { .nav a:not(.keep) { display: none; } .nav { gap: 14px; align-items: center; } .logo { font-size: 23px; white-space: nowrap; } }
+
 .nav { align-items: center; }
 
 /* hero */
@@ -189,6 +207,40 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 
 /* sections */
 .sec { padding-block: 56px; border-top: 1px solid var(--line); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.pagehead { padding-block: clamp(24px, 4vw, 48px) 20px; display: grid; gap: 10px; }
+.pagehead h1 { font-size: clamp(34px, 5vw, 58px); max-width: 18ch; }
+.pagehead h1 em { font-style: normal; color: var(--accent); }
+.pagehead p:not(.label) { color: var(--muted); max-width: 58ch; font-size: 16px; }
+.home-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(24px, 4vw, 56px); align-items: center; padding-block: clamp(28px, 5vw, 64px) 48px; }
+.hh-text { display: grid; gap: 18px; }
+.home-hero h1 { font-size: clamp(42px, 6.4vw, 78px); }
+.home-hero h1 em { font-style: normal; color: var(--accent); }
+.home-hero p:not(.label) { color: var(--muted); max-width: 44ch; font-size: 16.5px; }
+.hh-art canvas { display: block; width: 100%; max-width: 520px; aspect-ratio: 1; margin-inline: auto; border-radius: 28px; box-shadow: 0 30px 60px -42px rgba(0,0,0,.45); }
+@media (max-width: 820px) { .home-hero { grid-template-columns: 1fr; } .hh-art canvas { max-width: 420px; } }
+.more { font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; }
+.more:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ready { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.rcard { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+.rcard canvas { display: block; width: 100%; aspect-ratio: 1; border-radius: 14px; }
+.rcard h3 { font-size: 28px; }
+.rcard p { font-size: 13.5px; color: var(--muted); }
+.rcard .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.rcard .chips span { font-size: 12px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; color: var(--muted); }
+.rcard .price { font: 400 26px/1 var(--display); }
+.rcard .price small { font: 500 12px var(--body); color: var(--muted); margin-right: 4px; }
+.rcard .acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.rcard .acts .cta { padding: 10px 14px; font-size: 14px; }
+.stonestrip { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 6px; }
+.stonelink { display: grid; justify-items: center; gap: 8px; padding: 14px 6px; border-radius: 16px; text-decoration: none; color: var(--ink); font-size: 13px; font-weight: 600; text-align: center; }
+.stonelink:hover { background: var(--surface); }
+.stonelink canvas { width: 60px; height: 60px; }
+.band { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: clamp(22px, 4vw, 40px); display: grid; gap: 14px; }
+.band h2 { font-size: clamp(30px, 4vw, 44px); }
+.band p { color: var(--muted); max-width: 54ch; }
+.flinks { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.flinks a { color: inherit; }
 .sec > header { display: flex; justify-content: space-between; align-items: end; gap: 12px 24px; flex-wrap: wrap; margin-bottom: 28px; }
 .sec h2 { font-size: clamp(32px, 4.4vw, 48px); }
 .sec > header p { color: var(--muted); max-width: 52ch; }
@@ -270,6 +322,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   .tabbar button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
   .tabbar small { font: 500 11px var(--mono); letter-spacing: 0; text-transform: none; }
   body.in-cfg .mbar, body:not(.in-cfg) .tabbar { display: none; }
+  body:not([data-view="constructor"]) .mbar, body:not([data-view="constructor"]) .tabbar { display: none; }
   .panel > [data-tab] { display: none; }
   .panel > [data-tab].on { display: grid; }
   .panel { min-height: 320px; align-content: start; }
@@ -284,38 +337,72 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 <script>try { document.documentElement.setAttribute('data-theme', localStorage.getItem('ac-theme') || 'light'); } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }</script>
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#constructor" aria-label="Air Chains, на початок">
+    <a class="logo" href="#home" aria-label="Air Chains, головна">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke-dasharray="2 2.4" opacity=".5"/><circle cx="12" cy="3.5" r="2.6"/><circle cx="20.1" cy="9.4" r="2.6"/><circle cx="17" cy="18.9" r="2.6"/><circle cx="7" cy="18.9" r="2.6"/><circle cx="3.9" cy="9.4" r="2.6"/></svg>
       Air Chains
     </a>
-    <nav class="nav" aria-label="Розділи">
-      <a class="keep" href="#constructor">Конструктор</a>
-      <a href="#stones">Камені</a>
-      <a href="#size">Розмір</a>
-      <a href="#process">Як ми працюємо</a>
-      <a href="#faq">Питання</a>
-      <a class="keep ig" href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
-      <button class="themebtn" id="theme" type="button" aria-label="Темна тема"></button>
+    <nav class="nav" id="nav" aria-label="Розділи">
+      <a href="#constructor" data-nav="constructor">Конструктор</a>
+      <a href="#bracelets" data-nav="bracelets">Готові браслети</a>
+      <a href="#stones" data-nav="stones">Камені</a>
+      <a href="#info" data-nav="info">Допомога</a>
     </nav>
+    <div class="hdr">
+      <a class="ig" href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+      <button class="themebtn" id="theme" type="button" aria-label="Темна тема"></button>
+      <button class="themebtn menubtn" id="menubtn" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
   </div>
 </header>
 
 <main>
-  <section class="wrap hero">
-    <div>
-      <p class="label">Air Chains · натуральне каміння · ручне збирання</p>
-      <h1>Зберіть браслет із <em>каменів</em>, які обираєте самі</h1>
-    </div>
-    <div>
-      <p>Вкажіть обхват зап’ястка, оберіть камені та підвіски. Браслет одразу зʼявляється на дошці майстра, а ціна рахується по кожній бусині.</p>
-      <div class="facts">
-        <div><b>16</b><span>видів каменю</span></div>
-        <div><b>6–10 мм</b><span>розміри бусин</span></div>
-        <div><b>2 дні</b><span>на збирання</span></div>
+  <div class="view" data-view="home">
+    <section class="wrap home-hero">
+      <div class="hh-text">
+        <p class="label">Air Chains · натуральне каміння · ручна робота</p>
+        <h1>Браслети з натурального каміння, зібрані <em>під вас</em></h1>
+        <p>Оберіть готовий браслет або зберіть свій у конструкторі: камені, розмір бусин, підвіски. Майстер збере його вручну за 2 дні.</p>
+        <div class="row"><a class="cta" href="#constructor">Зібрати свій браслет</a><a class="cta ghost" href="#bracelets">Готові браслети</a></div>
+        <div class="facts">
+          <div><b>16</b><span>видів каменю</span></div>
+          <div><b>6–10 мм</b><span>розміри бусин</span></div>
+          <div><b>2 дні</b><span>на збирання</span></div>
+        </div>
       </div>
-    </div>
+      <div class="hh-art"><canvas id="homeart" role="img" aria-label="Браслет «Тиша»: аметист, місячний камінь і гірський кришталь"></canvas></div>
+    </section>
+  <section id="process" class="wrap sec">
+    <header><h2>Як це працює</h2></header>
+    <ol class="process">
+      <li><b>Оберіть або зберіть</b><span>Готовий браслет чи свій у конструкторі: видно точну довжину, склад і ціну.</span></li>
+      <li><b>Підбираємо камені наживо</b><span>Кожен камінь природний, тому до збирання надсилаємо фото саме ваших бусин.</span></li>
+      <li><b>Збираємо за 2 дні</b><span>Міцна еластична нитка, подвійний вузол, сховано в бусині.</span></li>
+      <li><b>Відправляємо</b><span>Новою Поштою або Укрпоштою, у мішечку або подарунковій коробці.</span></li>
+    </ol>
   </section>
+    <section class="wrap sec">
+      <header><h2>Готові браслети</h2><a class="more" href="#bracelets">Усі браслети →</a></header>
+      <div class="ready" id="homeReady"></div>
+    </section>
+    <section class="wrap sec">
+      <header><h2>Камені</h2><a class="more" href="#stones">Усі 16 каменів →</a></header>
+      <div class="stonestrip" id="homeStones"></div>
+    </section>
+    <section class="wrap sec">
+      <div class="band">
+        <h2>Не знаєте, що обрати?</h2>
+        <p>Напишіть нам в Instagram: розкажіть, для кого браслет і що хочеться відчувати. Підберемо камені разом.</p>
+        <div class="row"><a class="cta" href="https://ig.me/m/air_chains" target="_blank" rel="noopener">Написати в Direct</a><a class="cta ghost" href="#constructor">Відкрити конструктор</a></div>
+      </div>
+    </section>
+  </div>
 
+  <div class="view" data-view="constructor" hidden>
+    <section class="wrap pagehead">
+      <p class="label">Конструктор</p>
+      <h1>Зберіть браслет із <em>каменів</em>, які обираєте самі</h1>
+      <p>Вкажіть обхват зап’ястка, оберіть камені та підвіски. Браслет одразу зʼявляється на дошці, а ціна рахується по кожній бусині.</p>
+    </section>
   <section id="constructor" class="wrap cfg" aria-label="Конструктор браслета">
     <div class="stage">
       <div class="boardwrap" id="boardwrap">
@@ -418,12 +505,34 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       </div>
     </div>
   </section>
+  </div>
 
+  <div class="view" data-view="bracelets" hidden>
+    <section class="wrap pagehead">
+      <p class="label">Готові браслети</p>
+      <h1>Готові поєднання каменів</h1>
+      <p>Кожен браслет можна замовити як є або змінити в конструкторі: розмір, камені, підвіски. Ціна вказана для обхвату 16 см і бусин 8 мм.</p>
+    </section>
+    <section class="wrap" style="padding-bottom:56px"><div class="ready" id="readyList"></div></section>
+  </div>
+
+  <div class="view" data-view="stones" hidden>
+    <section class="wrap pagehead">
+      <p class="label">Камені</p>
+      <h1>16 натуральних каменів</h1>
+      <p>Значення каменів взяті з народної та літотерапевтичної традиції. Це символи, а не медичні властивості.</p>
+    </section>
   <section id="stones" class="wrap sec">
-    <header><h2>Камені</h2><p>Значення каменів взяті з народної та літотерапевтичної традиції. Це символи, а не медичні властивості.</p></header>
+    
     <div class="catalog" id="catalog"></div>
   </section>
+  </div>
 
+  <div class="view" data-view="info" hidden>
+    <section class="wrap pagehead">
+      <p class="label">Допомога</p>
+      <h1>Розмір, доставка і відповіді</h1>
+    </section>
   <section id="size" class="wrap sec">
     <header><h2>Як виміряти зап’ясток</h2></header>
     <div class="measure">
@@ -436,16 +545,6 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
     </div>
   </section>
 
-  <section id="process" class="wrap sec">
-    <header><h2>Як ми працюємо</h2></header>
-    <ol class="process">
-      <li><b>Ви збираєте браслет</b><span>У конструкторі видно точну довжину, склад і ціну.</span></li>
-      <li><b>Підбираємо камені наживо</b><span>Кожен камінь природний, тому до збирання надсилаємо фото саме ваших бусин.</span></li>
-      <li><b>Збираємо за 2 дні</b><span>Міцна еластична нитка, подвійний вузол, сховано в бусині.</span></li>
-      <li><b>Відправляємо</b><span>Новою Поштою або Укрпоштою, у мішечку або подарунковій коробці.</span></li>
-    </ol>
-  </section>
-
   <section id="faq" class="wrap sec">
     <header><h2>Питання</h2></header>
     <div class="faq">
@@ -455,10 +554,17 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       <details><summary>Можна поєднати бусини різних розмірів?</summary><p>Конструктор збирає браслет з одного розміру бусин. Якщо хочете змішати розміри, напишіть про це в коментарі до замовлення.</p></details>
     </div>
   </section>
+  </div>
+
+
+
+
+
+
 </main>
 
 <footer>
-  <div class="wrap"><span>Air Chains · браслети з натурального каміння</span><a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" style="color:inherit">Instagram</a></div>
+  <div class="wrap"><span>Air Chains · браслети з натурального каміння</span><span class="flinks"><a href="#constructor">Конструктор</a><a href="#bracelets">Готові браслети</a><a href="#stones">Камені</a><a href="#info">Допомога</a></span><a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" style="color:inherit">Instagram</a></div>
 </footer>
 
 <nav class="tabbar" id="tabbar" role="tablist" aria-label="Кроки конструктора">
@@ -509,12 +615,16 @@ const METALS = {
 };
 const CHARMS = [{ id: 'moon', name: 'Місяць' }, { id: 'star', name: 'Зірка' }, { id: 'heart', name: 'Серце' }, { id: 'leaf', name: 'Листок' }];
 const CHARM = Object.fromEntries(CHARMS.map(c => [c.id, c]));
+// ready-made bracelets: shown on the "Готові браслети" page and as quick starts in the constructor
 const PRESETS = [
-  { name: 'Тиша', pattern: ['amethyst', 'moonstone', 'amethyst', 'crystal'], charm: 'moon' },
-  { name: 'Сила', pattern: ['tigereye', 'onyx', 'tigereye', 'hematite'] },
-  { name: 'Ніжність', pattern: ['rosequartz', 'rosequartz', 'crystal', 'rhodonite'], charm: 'heart' },
-  { name: 'Море', pattern: ['aquamarine', 'amazonite', 'S', 'lapis', 'amazonite', 'S'] },
-  { name: 'Українські камені', pattern: ['labradorite', 'crystal', 'labradorite', 'aquamarine'] },
+  { name: 'Тиша', pattern: ['amethyst', 'moonstone', 'amethyst', 'crystal'], charm: 'moon', desc: 'Аметист, місячний камінь і гірський кришталь з підвіскою-місяцем. Для спокою і глибокого сну.' },
+  { name: 'Ніжність', pattern: ['rosequartz', 'rosequartz', 'crystal', 'rhodonite'], charm: 'heart', desc: 'Рожевий кварц, кришталь і родоніт з підвіскою-серцем. Найчастіше беруть у подарунок.' },
+  { name: 'Сила', pattern: ['tigereye', 'onyx', 'tigereye', 'hematite'], desc: 'Тигрове око, чорний онікс і гематит. Стриманий браслет для впевненості.' },
+  { name: 'Море', pattern: ['aquamarine', 'amazonite', 'S', 'lapis', 'amazonite', 'S'], desc: 'Аквамарин, амазоніт і лазурит зі срібними розділювачами. Усі відтінки води.' },
+  { name: 'Українські камені', pattern: ['labradorite', 'crystal', 'labradorite', 'aquamarine'], desc: 'Лабрадорит із Житомирщини, гірський кришталь і аквамарин з Волині.' },
+  { name: 'Ліс', pattern: ['malachite', 'nephrite', 'amazonite', 'nephrite'], charm: 'leaf', desc: 'Малахіт, нефрит і амазоніт з підвіскою-листком. Зелений браслет-оберіг.' },
+  { name: 'Сонце', pattern: ['carnelian', 'tigereye', 'carnelian', 'crystal'], charm: 'star', desc: 'Сердолік, тигрове око і кришталь із зіркою. Теплі кольори й енергія.' },
+  { name: 'Захист', pattern: ['onyx', 'labradorite', 'onyx', 'hematite'], desc: 'Чорний онікс, лабрадорит і гематит. Темний браслет, що пасує до всього.' },
 ];
 const BASE = 90, GIFT = 70, TOL = 2, MAX_CHARMS = 3, SPACER_W = 3;
 const KEY = 'airchains-design-v1';
@@ -1375,7 +1485,7 @@ $('#catalog').replaceChildren(...STONES.map(s => {
   const dl = el('dl');
   [['Твердість', s.mohs + ' за Моосом'], ['Походження', s.origin], ['6 / 8 / 10 мм', `${[6, 8, 10].map(d => beadPrice(s.id, d)).join(' / ')} грн`]].forEach(([t, d]) => dl.append(el('dt', { textContent: t }), el('dd', { textContent: d })));
   const add = el('button', { type: 'button', className: 'add', textContent: 'Додати в браслет' });
-  add.addEventListener('click', () => { state.sel = -1; addStone(s.id); toast(`${s.name}: додано в браслет`); });
+  add.addEventListener('click', () => { state.sel = -1; addStone(s.id); location.hash = '#constructor'; });
   return el('article', { className: 'card' }, [
     el('div', { className: 'head' }, [swatch(s.id, 64, 2), el('div', {}, [el('h3', { textContent: s.name }), el('div', { className: 'tags' }, s.intents.map(k => el('span', { textContent: INTENTS[k] })))])]),
     el('p', { textContent: s.meaning }), dl, add,
@@ -1437,8 +1547,78 @@ function setTab(t, fromUser) {
 document.querySelectorAll('#tabbar button').forEach(b => b.addEventListener('click', () => setTab(b.dataset.t, true)));
 setTab(tab);
 if ('IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => document.body.classList.toggle('in-cfg', e.isIntersecting)), { rootMargin: '0px 0px -45% 0px' }).observe($('#constructor'));
+/* ---------- ready-made bracelets ---------- */
+// run fn against a temporary design (default wrist 16 cm, comfort fit, 8 mm beads) and put the visitor's design back
+function withDesign(o, fn) {
+  const keep = { items: state.items, wrist: state.wrist, fit: state.fit, size: state.size, metal: state.metal, gift: state.gift, sel: state.sel };
+  Object.assign(state, { wrist: 160, fit: 15, size: 8, metal: 'silver', gift: false, sel: -1 }, o);
+  try { return fn(); } finally { Object.assign(state, keep); }
+}
+const presetItems = p => withDesign({}, () => { applyPreset(p); return state.items; });
+const presetPrice = items => withDesign({ items }, () => priceLines().reduce((a, l) => a + l[1], 0));
+function designCanvas(items, cssPx) {
+  const c = el('canvas'); const d = Math.min(window.devicePixelRatio || 1, 2);
+  c.width = c.height = Math.round(cssPx * d);
+  c._redraw = () => withDesign({ items }, () => drawBoard(c, cssPx, { mini: true }));
+  c._redraw();
+  return c;
+}
+function useReady(p, then) {
+  commit(() => { applyPreset(p); });
+  location.hash = then;
+  toast(`Браслет «${p.name}» у конструкторі`, true);
+}
+function readyCard(p) {
+  const items = presetItems(p), ids = [...new Set(p.pattern.filter(x => x !== 'S'))];
+  const cv = designCanvas(items, 320);
+  cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', `Браслет «${p.name}»`);
+  const edit = el('button', { type: 'button', className: 'cta ghost', textContent: 'Змінити під себе' });
+  edit.addEventListener('click', () => useReady(p, '#constructor'));
+  const buy = el('button', { type: 'button', className: 'cta', textContent: 'Замовити' });
+  buy.addEventListener('click', () => useReady(p, '#order'));
+  return el('article', { className: 'rcard' }, [
+    cv,
+    el('h3', { textContent: p.name }),
+    el('div', { className: 'chips' }, ids.map(id => el('span', { textContent: STONE[id].name }))),
+    el('p', { textContent: p.desc }),
+    (() => { const pr = el('div', { className: 'price' }); pr.append(el('small', { textContent: 'від' }), uah(presetPrice(items))); return pr; })(),
+    el('div', { className: 'acts' }, [buy, edit]),
+  ]);
+}
+$('#readyList').replaceChildren(...PRESETS.map(readyCard));
+$('#homeReady').replaceChildren(...PRESETS.slice(0, 3).map(readyCard));
+$('#homeStones').replaceChildren(...STONES.slice(0, 8).map(s => el('a', { className: 'stonelink', href: '#stones' }, [swatch(s.id, 60, 3), s.name])));
+(() => {
+  const art = $('#homeart'), d = Math.min(window.devicePixelRatio || 1, 2), items = presetItems(PRESETS[0]);
+  art.width = art.height = Math.round(520 * d);
+  art._redraw = () => withDesign({ items }, () => drawBoard(art, 520, { mini: true }));
+  art._redraw();
+})();
+
+/* ---------- sections: #home, #constructor, #bracelets, #stones, #info ---------- */
+const VIEWS = ['home', 'constructor', 'bracelets', 'stones', 'info'];
+function route() {
+  const id = decodeURIComponent(location.hash.slice(1)) || 'home';
+  let view = VIEWS.includes(id) ? id : null, target = null;
+  if (!view) { const t = document.getElementById(id), v = t && t.closest('.view'); if (v) { view = v.dataset.view; target = t; } }
+  view = view || 'home';
+  document.querySelectorAll('.view').forEach(v => { v.hidden = v.dataset.view !== view; });
+  document.body.dataset.view = view;
+  document.querySelectorAll('#nav a').forEach(a => { if (a.dataset.nav === view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  closeMenu();
+  if (view === 'constructor') requestAnimationFrame(() => { sizeBoard(); syncWheel(); render(); });
+  requestAnimationFrame(() => { if (target) target.scrollIntoView({ block: 'start' }); else window.scrollTo(0, 0); });
+}
+function closeMenu() { document.body.classList.remove('menu-open'); $('#menubtn').setAttribute('aria-expanded', 'false'); }
+$('#menubtn').addEventListener('click', () => { const open = !document.body.classList.contains('menu-open'); document.body.classList.toggle('menu-open', open); $('#menubtn').setAttribute('aria-expanded', String(open)); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+// a link to the section you are already on still scrolls back to its top
+document.addEventListener('click', e => { const a = e.target.closest('a[href^="#"]'); if (a && a.getAttribute('href') === location.hash) { e.preventDefault(); route(); } });
+window.addEventListener('hashchange', route);
+
 render();
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+route();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { draw(); document.querySelectorAll('canvas').forEach(c => c._redraw && c._redraw()); });
 })();
 </script>
 </body></html>
