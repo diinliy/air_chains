@@ -27,6 +27,8 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+/* quick repeated taps (adding beads) must not trigger double-tap zoom; pinch zoom still works */
+html, body, button, a, input, select, textarea, label, canvas { touch-action: manipulation; }
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); }
 button, input, select { font: inherit; color: inherit; }

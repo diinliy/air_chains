@@ -41,6 +41,8 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+/* quick repeated taps (adding beads) must not trigger double-tap zoom; pinch zoom still works */
+html, body, button, a, input, select, textarea, label, canvas { touch-action: manipulation; }
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
