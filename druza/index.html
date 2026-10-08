@@ -73,6 +73,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); display: grid; gap: 12px; }
 .boardwrap { position: relative; width: 100%; max-width: 620px; aspect-ratio: 1; border-radius: 22px; overflow: hidden; background: var(--board); box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px -24px rgba(0,0,0,.6); }
 #board { width: 100%; height: 100%; display: block; touch-action: manipulation; cursor: pointer; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.hud { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; pointer-events: none; }
+.hud .chip { background: rgba(16,24,21,.74); border-color: rgba(255,255,255,.12); color: #E9EFEB; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); font-size: 12.5px; }
+.hud .chip.add { color: #F6C38F; } .hud .chip.ok { color: #9BDDB2; } .hud .chip.warn { color: #F4A08A; } .hud .chip.idle { color: #C9D2CD; }
+.hud .chip.total::before { display: none; }
 .statusrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; max-width: 620px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--surface); border: 1px solid var(--line); }
 .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
@@ -86,6 +90,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .sel b { color: var(--ink); font-weight: 600; }
 .panel { display: grid; gap: 26px; min-width: 0; }
 .group { display: grid; gap: 12px; }
+.group > .seg { justify-self: start; }
 .group > header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .group h2 { font-size: 26px; }
 .row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
@@ -93,6 +98,25 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .seg button { border: 0; background: transparent; border-radius: 9px; padding: 7px 12px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); display: grid; line-height: 1.2; text-align: left; }
 .seg button small { font-weight: 500; font-size: 11px; }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.wristrow { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.wheelwrap { position: relative; width: 132px; flex: none; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.wheelwrap::after { content: ""; position: absolute; left: 8px; right: 8px; top: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 60%, transparent); pointer-events: none; z-index: 0; }
+.wheel { position: relative; z-index: 1; height: 132px; overflow-y: auto; scroll-snap-type: y mandatory; overscroll-behavior: contain; scrollbar-width: none; -webkit-mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); }
+.wheel::-webkit-scrollbar { display: none; }
+.wheel .pad { height: 44px; }
+.wheel button { display: flex; align-items: baseline; justify-content: center; gap: 4px; width: 100%; height: 44px; scroll-snap-align: center; border: 0; background: transparent; cursor: pointer; font: 400 26px/44px var(--display); color: var(--muted); }
+.wheel button small { font: 600 11px var(--body); letter-spacing: .08em; }
+.wheel button.on { color: var(--ink); }
+.wristinfo { display: grid; gap: 6px; flex: 1 1 180px; min-width: 0; }
+.wristinfo p { font-size: 13.5px; color: var(--muted); }
+.wristinfo output { font-size: 13px; }
+.linkbtn { border: 0; background: none; padding: 4px 0; font-size: 13px; font-weight: 600; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.colors { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.colors .dot { width: 28px; height: 28px; border-radius: 50%; border: 0; cursor: pointer; box-shadow: inset 0 -4px 7px rgba(0,0,0,.28), inset 0 3px 5px rgba(255,255,255,.45), 0 1px 2px rgba(0,0,0,.2); }
+.colors .dot[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 2px; }
+.colors .all { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 4px 11px; font-size: 13px; cursor: pointer; color: var(--muted); }
+.colors .all[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); background: var(--surface); }
+.empty { font-size: 13.5px; color: var(--muted); }
 .wrist { display: grid; gap: 6px; flex: 1 1 240px; min-width: 0; }
 .wrist .top-line { display: flex; justify-content: space-between; align-items: baseline; }
 .wrist output { font: 500 18px var(--mono); }
@@ -140,8 +164,15 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .cta.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 @media (max-width: 900px) {
   .cfg { grid-template-columns: 1fr; }
-  .stage { position: static; }
+  .stage { position: static; gap: 10px; }
   .boardwrap { margin-inline: auto; }
+  #constructor { scroll-margin-top: 58px; }
+  .sel { font-size: 12.5px; }
+  .tools { justify-content: space-between; flex-wrap: nowrap; }
+  .tbtn { width: 46px; height: 42px; justify-content: center; padding: 0; border-radius: 50%; }
+  .tbtn svg { width: 18px; height: 18px; }
+  .tbtn .tl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .panel .tbtn { width: auto; height: auto; padding: 7px 11px; border-radius: 10px; }
 }
 
 /* sections */
@@ -213,12 +244,21 @@ footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var
 footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
 
 .mbar { display: none; }
+.tabbar { display: none; }
 @media (max-width: 900px) {
   .mbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--surface); border-top: 1px solid var(--line); }
   .mbar strong { font: 400 26px/1 var(--display); }
   .mbar small { display: block; color: var(--muted); font-size: 12px; }
   .mbar .cta { padding: 11px 18px; }
   body { padding-bottom: 76px; }
+  .tabbar { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .tabbar button { border: 0; background: transparent; min-height: 58px; padding: 8px 4px; font: 600 12px/1.2 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: grid; align-content: center; justify-items: center; gap: 3px; cursor: pointer; }
+  .tabbar button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+  .tabbar small { font: 500 11px var(--mono); letter-spacing: 0; text-transform: none; }
+  body.in-cfg .mbar, body:not(.in-cfg) .tabbar { display: none; }
+  .panel > [data-tab] { display: none; }
+  .panel > [data-tab].on { display: grid; }
+  .panel { min-height: 320px; align-content: start; }
 }
 .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 40; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); display: flex; gap: 12px; align-items: center; }
 .toast.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
@@ -264,50 +304,53 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
     <div class="stage">
       <div class="boardwrap" id="boardwrap">
         <canvas id="board" tabindex="0" role="img" aria-label="Попередній перегляд браслета. Стрілки вибирають бусину, Delete видаляє."></canvas>
-      </div>
-      <div class="statusrow">
-        <span class="chip idle" id="status">—</span>
-        <span class="mono" id="lenline" style="font-size:13px;color:var(--muted)"></span>
+        <div class="hud" aria-live="polite"><span class="chip idle" id="status">—</span><span class="chip total mono" id="hudtotal"></span></div>
       </div>
       <div class="sel" id="selinfo" aria-live="polite"></div>
       <div class="tools">
         <button class="tbtn" id="t-left" type="button" aria-label="Перемістити ліворуч" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg><span class="tl">Перемістити</span></button>
         <button class="tbtn" id="t-right" type="button" aria-label="Перемістити праворуч" disabled><span class="tl">Перемістити</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m6 3 5 5-5 5"/></svg></button>
-        <button class="tbtn" id="t-del" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h10M6 4V2.5h4V4M4.5 4l.7 9.5h5.6l.7-9.5"/></svg><span class="tl">Видалити</span></button>
-        <button class="tbtn" id="t-undo" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3 2 6l3 3"/><path d="M2 6h7.5a4 4 0 0 1 0 8H6"/></svg><span class="tl">Скасувати</span></button>
-        <button class="tbtn" id="t-clear" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.5"/><path d="M4.2 11.8l7.6-7.6"/></svg><span class="tl">Очистити</span></button>
+        <button class="tbtn" id="t-del" type="button" aria-label="Видалити" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h10M6 4V2.5h4V4M4.5 4l.7 9.5h5.6l.7-9.5"/></svg><span class="tl">Видалити</span></button>
+        <button class="tbtn" id="t-undo" type="button" aria-label="Скасувати" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3 2 6l3 3"/><path d="M2 6h7.5a4 4 0 0 1 0 8H6"/></svg><span class="tl">Скасувати</span></button>
+        <button class="tbtn" id="t-redo" type="button" aria-label="Повернути" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m11 3 3 3-3 3"/><path d="M14 6H6.5a4 4 0 0 0 0 8H10"/></svg><span class="tl">Повернути</span></button>
+        <button class="tbtn" id="t-clear" type="button" aria-label="Очистити"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.5"/><path d="M4.2 11.8l7.6-7.6"/></svg><span class="tl">Очистити</span></button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="group">
-        <header><h2>Розмір</h2><span class="label">довжина рахується сама</span></header>
-        <div class="row">
-          <div class="wrist">
-            <div class="top-line"><label for="wrist" style="font-size:13px;font-weight:600">Обхват зап’ястка</label><output id="wristout" for="wrist">16,0 см</output></div>
-            <input type="range" id="wrist" min="130" max="210" step="5" value="160">
+      <div class="group" data-tab="size">
+        <header><h2>Розмір</h2><a class="label" href="#size">як виміряти</a></header>
+        <div class="wristrow">
+          <div class="wheelwrap"><div class="wheel" id="wheel" tabindex="0" role="listbox" aria-label="Обхват зап’ястка, см"></div></div>
+          <div class="wristinfo">
+            <span class="label">Обхват зап’ястка</span>
+            <p>Прокрутіть значення в сантиметрах. Довжина браслета зміниться автоматично.</p>
+            <output id="wristout" class="mono"></output>
           </div>
         </div>
-        <div class="row">
-          <div class="seg" id="fitseg" role="group" aria-label="Посадка"></div>
-          <div class="seg" id="sizeseg" role="group" aria-label="Діаметр бусин"></div>
-        </div>
+        <div class="seg" id="fitseg" role="group" aria-label="Посадка"></div>
       </div>
 
-      <div class="group">
+      <div class="group" data-tab="stones">
         <header><h2>Камені</h2><span class="mode" id="mode"></span></header>
+        <div class="row sizes">
+          <div class="seg" id="sizeseg" role="group" aria-label="Діаметр нової бусини"></div>
+          <button class="linkbtn" id="a-allsize" type="button">Зробити всі бусини такими</button>
+        </div>
+        <div class="colors" id="colors" role="group" aria-label="Фільтр за кольором"></div>
         <div class="filters" id="filters" role="group" aria-label="Фільтр за значенням"></div>
+        <p class="empty" id="empty" hidden>Немає каменів з такими фільтрами.</p>
         <div class="palette" id="palette"></div>
         <div class="info" id="info"></div>
       </div>
 
-      <div class="group">
+      <div class="group" data-tab="charms">
         <header><h2>Метал і підвіски</h2><span class="label">до 3 підвісок</span></header>
         <div class="seg" id="metalseg" role="group" aria-label="Метал фурнітури"></div>
         <div class="addons" id="addons"></div>
       </div>
 
-      <div class="group">
+      <div class="group" data-tab="stones">
         <header><h2>Швидкий старт</h2></header>
         <div class="presets" id="presets"></div>
         <div class="row">
@@ -316,7 +359,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
         </div>
       </div>
 
-      <div class="summary">
+      <div class="summary" data-tab="price">
         <div class="lines" id="lines"></div>
         <label class="check"><input type="checkbox" id="gift"> Подарункова коробка з карткою значень каменів, +70 грн</label>
         <div class="total"><span class="label">Разом</span><strong class="mono" style="font-family:var(--display)" id="total">0 грн</strong></div>
@@ -399,7 +442,13 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   <div class="wrap"><span>Air Chains · браслети з натурального каміння</span><a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" style="color:inherit">Instagram</a></div>
 </footer>
 
-<div class="mbar" aria-hidden="false">
+<nav class="tabbar" id="tabbar" role="tablist" aria-label="Кроки конструктора">
+  <button type="button" role="tab" data-t="size">Розмір</button>
+  <button type="button" role="tab" data-t="stones">Камені</button>
+  <button type="button" role="tab" data-t="charms">Шарми</button>
+  <button type="button" role="tab" data-t="price">Ціна<small id="tabprice"></small></button>
+</nav>
+<div class="mbar">
   <div><strong id="mtotal">0 грн</strong><small id="msub"></small></div>
   <a class="cta" href="#order">Оформити</a>
 </div>
@@ -426,9 +475,15 @@ const STONES = [
   { id: 'howlite', name: 'Говліт', price: 10, mohs: '3,5', origin: 'США', intents: ['calm'], meaning: 'Білий камінь із сірими прожилками. Повʼязують із терпінням і тишею.', look: { type: 'veins', c: ['#FFFFFF', '#ECEBE6', '#C6C3BB'], accent: '#5F5E5B' } },
 ];
 const STONE = Object.fromEntries(STONES.map(s => [s.id, s]));
+const COLORS = [
+  { k: 'white', c: '#F1EEE6', name: 'Білі й прозорі' }, { k: 'grey', c: '#4A4E52', name: 'Сірі й чорні' }, { k: 'pink', c: '#E8A2AF', name: 'Рожеві' },
+  { k: 'violet', c: '#9257C2', name: 'Фіолетові' }, { k: 'blue', c: '#3E66C8', name: 'Сині й блакитні' }, { k: 'green', c: '#3D9064', name: 'Зелені' }, { k: 'warm', c: '#D98A2E', name: 'Помаранчеві й золоті' },
+];
+const COLOR_OF = { amethyst: 'violet', rosequartz: 'pink', crystal: 'white', moonstone: 'white', labradorite: 'grey', tigereye: 'warm', onyx: 'grey', lapis: 'blue', aquamarine: 'blue', nephrite: 'green', amazonite: 'green', carnelian: 'warm', hematite: 'grey', rhodonite: 'pink', malachite: 'green', howlite: 'white' };
+const WRISTS = []; for (let w = 130; w <= 210; w += 5) WRISTS.push(w);
 const INTENTS = { all: 'Усі', calm: 'Спокій', love: 'Любов', protect: 'Захист', energy: 'Енергія', clarity: 'Ясність' };
 const SIZES = { 6: 0.75, 8: 1, 10: 1.4 };
-const FITS = [{ v: 10, label: 'Щільно', sub: '+1 см' }, { v: 15, label: 'Комфортно', sub: '+1,5 см' }, { v: 20, label: 'Вільно', sub: '+2 см' }];
+const FITS = [{ v: 10, label: 'Щільно', sub: '+1 см', adj: 'щільна' }, { v: 15, label: 'Комфортно', sub: '+1,5 см', adj: 'комфортна' }, { v: 20, label: 'Вільно', sub: '+2 см', adj: 'вільна' }];
 const METALS = {
   silver: { name: 'Срібло 925', short: 'срібло', c: ['#FBFCFD', '#C2C7CB', '#767C82'], spacer: 24, charm: 160 },
   gold: { name: 'Позолота', short: 'позолота', c: ['#FFF1C2', '#D6A84C', '#80601B'], spacer: 30, charm: 190 },
@@ -446,8 +501,8 @@ const BASE = 90, GIFT = 70, TOL = 2, MAX_CHARMS = 3, SPACER_W = 3;
 const KEY = 'airchains-design-v1';
 
 const state = { wrist: 160, fit: 15, size: 8, metal: 'silver', gift: false, items: [], sel: -1 };
-let filter = 'all', infoId = 'amethyst';
-const history = [];
+let filter = 'all', colorF = 'all', infoId = 'amethyst', tab = 'stones';
+const history = [], future = [];
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -461,9 +516,12 @@ const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(
 const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; };
 const normA = x => ((x + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
 const target = () => state.wrist + state.fit;
-const width = it => it.k === 's' ? state.size : it.k === 'sp' ? SPACER_W : 0;
+const width = it => it.k === 's' ? it.d : it.k === 'sp' ? SPACER_W : 0;
+const MIN_D = 6;
+const maxD = (items = state.items) => items.reduce((m, it) => it.k === 's' ? Math.max(m, it.d) : m, 0) || state.size;
+const sizesLabel = (items = state.items) => { const ds = [...new Set(items.filter(i => i.k === 's').map(i => i.d))].sort((a, b) => a - b); return ds.length > 1 ? `${ds[0]}–${ds[ds.length - 1]} мм` : `${ds[0] || state.size} мм`; };
 const lengthOf = items => items.reduce((a, it) => a + width(it), 0);
-const beadPrice = id => Math.round(STONE[id].price * SIZES[state.size]);
+const beadPrice = (id, d = state.size) => Math.round(STONE[id].price * SIZES[d]);
 const stoneCount = () => state.items.filter(i => i.k === 's').length;
 const clone = it => ({ ...it });
 
@@ -729,13 +787,13 @@ function geometry(S) {
   return { S, cx, cy, R, tgt, ppm, total, lay };
 }
 function rrect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
-function charmAnchor(G, o) { const d = state.size, rr = G.R - (d / 2 + 4.2 + 6) * G.ppm; return { x: G.cx + Math.cos(o.a) * rr, y: G.cy + Math.sin(o.a) * rr, r: 6.5 * G.ppm }; }
+function charmAnchor(G, o) { const d = maxD(), rr = G.R - (d / 2 + 4.2 + 6) * G.ppm; return { x: G.cx + Math.cos(o.a) * rr, y: G.cy + Math.sin(o.a) * rr, r: 6.5 * G.ppm }; }
 
 function drawItem(ctx, G, o, x, y, alpha = 1) {
-  const { ppm } = G, it = o.it, d = state.size;
+  const { ppm } = G, it = o.it, d = maxD();
   ctx.save(); ctx.globalAlpha = alpha;
   if (it.k === 's') {
-    const px = d * ppm;
+    const px = it.d * ppm;
     ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = px * 0.2; ctx.shadowOffsetX = px * 0.05; ctx.shadowOffsetY = px * 0.1;
     ctx.drawImage(stoneSprite(it.id, it.v), x - px / 2, y - px / 2, px, px);
   } else if (it.k === 'sp') {
@@ -767,7 +825,7 @@ function drawBoard(canvas, S, opts = {}) {
   ctx.fillStyle = noisePattern(ctx); ctx.fillRect(0, 0, S, S);
   const { cx, cy, R, ppm, tgt } = G;
   // groove
-  const gw = Math.max(state.size * ppm + 10, 18);
+  const gw = Math.max(maxD() * ppm + 10, 18);
   ctx.strokeStyle = 'rgba(0,0,0,.28)'; ctx.lineWidth = gw; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
   ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(cx, cy, R + gw / 2, 0, Math.PI * 2); ctx.stroke();
   // ruler
@@ -828,7 +886,7 @@ function drawBoard(canvas, S, opts = {}) {
     } else {
       ctx.fillStyle = '#E9EFEB'; ctx.font = `${S * 0.1}px Forum, serif`; ctx.fillText(String(n), cx, cy - S * 0.01);
       ctx.fillStyle = 'rgba(233,239,235,.65)'; ctx.font = `500 ${S * 0.026}px Manrope, sans-serif`;
-      ctx.fillText(`${plural(n, 'бусина', 'бусини', 'бусин')} · ${state.size} мм`, cx, cy + S * 0.035);
+      ctx.fillText(`${plural(n, 'бусина', 'бусини', 'бусин')} · ${sizesLabel()}`, cx, cy + S * 0.035);
       ctx.font = `${S * 0.024}px "JetBrains Mono", monospace`;
       ctx.fillText(`${cm(G.total)} / ${cm(tgt)} см`, cx, cy + S * 0.075);
     }
@@ -853,7 +911,7 @@ function hitAt(x, y) {
   for (const o of G.lay) {
     if (o.it.k === 'ch') continue;
     const half = Math.max(o.w, 5) / 2 * G.ppm / G.R, diff = Math.abs(normA(ang - o.a));
-    if (diff <= half && Math.abs(dist - G.R) <= Math.max(state.size, 6) / 2 * G.ppm + 6 && diff < bd) { bd = diff; best = o.i; }
+    if (diff <= half && Math.abs(dist - G.R) <= Math.max(o.it.d || 6, 6) / 2 * G.ppm + 6 && diff < bd) { bd = diff; best = o.i; }
   }
   return best;
 }
@@ -920,12 +978,11 @@ board.addEventListener('keydown', e => {
 /* ---------- design operations ---------- */
 function snapshot() { return JSON.stringify({ items: state.items, size: state.size, wrist: state.wrist, fit: state.fit, metal: state.metal }); }
 function pushHistory(snap = snapshot()) { history.push(snap); if (history.length > 60) history.shift(); }
-function commit(fn) { pushHistory(); fn(); render(); }
-function undo() {
-  const s = history.pop(); if (!s) return;
-  Object.assign(state, JSON.parse(s)); state.sel = -1; render(); toast('Скасовано');
-}
-function isFull(items, size, tgt) { const len = items.reduce((a, it) => a + (it.k === 's' ? size : it.k === 'sp' ? SPACER_W : 0), 0); return items.length > 0 && tgt - len < size; }
+function commit(fn) { pushHistory(); future.length = 0; fn(); render(); }
+function restore(snap) { Object.assign(state, JSON.parse(snap)); state.sel = -1; render(); }
+function undo() { const s = history.pop(); if (!s) return; future.push(snapshot()); restore(s); toast('Скасовано'); }
+function redo() { const s = future.pop(); if (!s) return; history.push(snapshot()); restore(s); toast('Повернуто'); }
+function isFull(items, tgt) { return items.some(i => i.k !== 'ch') && tgt - lengthOf(items) < maxD(items); }
 function fitPattern(pattern) {
   const charms = pattern.map((it, i) => ({ it, i })).filter(o => o.it.k === 'ch');
   const base = pattern.filter(it => it.k !== 'ch');
@@ -948,7 +1005,7 @@ function trim(items) {
   return out;
 }
 function refit(base, wasFull) { state.items = wasFull ? fitPattern(base) : trim(base); state.sel = -1; }
-const toItem = code => code === 'S' ? { k: 'sp' } : { k: 's', id: code, v: rv() };
+const toItem = code => code === 'S' ? { k: 'sp' } : { k: 's', id: code, v: rv(), d: state.size };
 function applyPreset(p) {
   state.items = fitPattern(p.pattern.map(toItem));
   if (p.charm) state.items.splice(Math.round(state.items.length / 2), 0, { k: 'ch', id: p.charm });
@@ -959,13 +1016,14 @@ function addStone(id) {
   infoId = id;
   const cur = state.items[state.sel];
   if (cur && cur.k === 's') {
-    if (cur.id === id) { render(); return; }
-    commit(() => { state.items[state.sel] = { k: 's', id, v: rv() }; });
+    if (cur.id === id && cur.d === state.size) { render(); return; }
+    if (lengthOf(state.items) - cur.d + state.size > target() + TOL) { toast(`Бусина ${state.size} мм не вміщається. Оберіть менший розмір.`); return; }
+    commit(() => { state.items[state.sel] = { k: 's', id, v: rv(), d: state.size }; });
     toast(`Замінено на «${STONE[id].name}»`);
     return;
   }
-  if (lengthOf(state.items) + state.size > target() + TOL) { toast('Браслет заповнений. Видаліть бусину або замініть вибрану.'); renderInfo(); return; }
-  commit(() => { const p = insertPos(); state.items.splice(p, 0, { k: 's', id, v: rv() }); if (state.sel >= 0) state.sel = p; });
+  if (lengthOf(state.items) + state.size > target() + TOL) { toast(state.size > MIN_D && lengthOf(state.items) + MIN_D <= target() + TOL ? `Бусина ${state.size} мм не вміщається. Спробуйте ${MIN_D} мм.` : 'Браслет заповнений. Видаліть бусину або замініть вибрану.'); renderInfo(); return; }
+  commit(() => { const p = insertPos(); state.items.splice(p, 0, { k: 's', id, v: rv(), d: state.size }); if (state.sel >= 0) state.sel = p; });
 }
 function addSpacer() {
   if (lengthOf(state.items) + SPACER_W > target() + TOL) { toast('Немає місця для розділювача. Спершу видаліть одну бусину.'); return; }
@@ -1007,27 +1065,62 @@ function segButtons(host, opts, get, set) {
 }
 segButtons($('#fitseg'), FITS, () => state.fit, v => {
   if (v === state.fit) return;
-  const wasFull = isFull(state.items, state.size, target());
+  const wasFull = isFull(state.items, target());
   commit(() => { const base = state.items; state.fit = v; refit(base, wasFull); });
 });
-segButtons($('#sizeseg'), [6, 8, 10].map(v => ({ v, label: `${v} мм` })), () => state.size, v => {
-  if (v === state.size) return;
-  const wasFull = isFull(state.items, state.size, target());
-  commit(() => { const base = state.items; state.size = v; refit(base, wasFull); });
-  if (wasFull) toast('Візерунок підлаштовано під новий розмір бусин');
+// size for the next bead added or swapped, like picking 6/8/10 mm cards in a bead shop
+segButtons($('#sizeseg'), [6, 8, 10].map(v => ({ v, label: `${v} мм` })), () => state.size, v => { state.size = v; render(); });
+$('#a-allsize').addEventListener('click', () => {
+  if (!state.items.some(i => i.k === 's' && i.d !== state.size)) { toast(`Усі бусини вже ${state.size} мм`); return; }
+  const wasFull = isFull(state.items, target());
+  commit(() => { refit(state.items.map(it => it.k === 's' ? { ...it, d: state.size } : it), wasFull); });
+  toast(`Усі бусини тепер ${state.size} мм`);
 });
 segButtons($('#metalseg'), Object.entries(METALS).map(([v, m]) => ({ v, label: m.name })), () => state.metal, v => {
   if (v === state.metal) return; commit(() => { state.metal = v; }); buildAddons();
 });
 
-let wristBase = null;
-$('#wrist').addEventListener('input', e => {
-  if (!wristBase) wristBase = { snap: snapshot(), items: state.items, wasFull: isFull(state.items, state.size, target()) };
-  state.wrist = +e.target.value; refit(wristBase.items, wristBase.wasFull); render();
+/* wrist wheel: a scroll-snap list that settles on one value */
+const wheel = $('#wheel'), WH = 44;
+let wheelTimer = 0, wheelQuiet = false;
+wheel.replaceChildren(el('div', { className: 'pad' }), ...WRISTS.map(w => {
+  const b = el('button', { type: 'button', tabIndex: -1 }); b.innerHTML = `${w % 10 ? Math.floor(w / 10) + ',5' : w / 10}<small>см</small>`;
+  b.dataset.w = w; b.setAttribute('role', 'option');
+  b.addEventListener('click', () => wheel.scrollTo({ top: WRISTS.indexOf(w) * WH, behavior: 'smooth' }));
+  return b;
+}), el('div', { className: 'pad' }));
+function markWheel(w) { wheel.querySelectorAll('button').forEach(b => { const on = +b.dataset.w === w; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); }); }
+function syncWheel() {
+  const i = WRISTS.indexOf(state.wrist);
+  markWheel(state.wrist);
+  if (i >= 0 && wheel.clientHeight && Math.round(wheel.scrollTop / WH) !== i) { wheelQuiet = true; wheel.scrollTop = i * WH; setTimeout(() => { wheelQuiet = false; }, 120); }
+}
+function setWrist(w) {
+  if (w === state.wrist) return;
+  const wasFull = isFull(state.items, target());
+  commit(() => { const base = state.items; state.wrist = w; refit(base, wasFull); });
+}
+wheel.addEventListener('scroll', () => {
+  const i = Math.max(0, Math.min(WRISTS.length - 1, Math.round(wheel.scrollTop / WH)));
+  markWheel(WRISTS[i]);
+  if (wheelQuiet) return;
+  clearTimeout(wheelTimer); wheelTimer = setTimeout(() => setWrist(WRISTS[i]), 160);
 });
-$('#wrist').addEventListener('change', () => { if (wristBase) { pushHistory(wristBase.snap); wristBase = null; render(); } });
+wheel.addEventListener('keydown', e => {
+  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+  e.preventDefault();
+  const i = WRISTS.indexOf(state.wrist) + (e.key === 'ArrowDown' ? 1 : -1);
+  if (WRISTS[i]) { setWrist(WRISTS[i]); }
+});
 
-$('#filters').replaceChildren(...Object.entries(INTENTS).map(([k, label]) => {
+$('#colors').replaceChildren(...[{ k: 'all', name: 'Усі кольори' }, ...COLORS].map(c => {
+  const b = el('button', { type: 'button', className: c.k === 'all' ? 'all' : 'dot', title: c.name });
+  if (c.k === 'all') b.textContent = 'Усі'; else { b.style.background = c.c; b.setAttribute('aria-label', c.name); }
+  b.dataset.k = c.k;
+  b.addEventListener('click', () => { colorF = colorF === c.k && c.k !== 'all' ? 'all' : c.k; renderPalette(); });
+  return b;
+}));
+$('#filters').replaceChildren(...[['inuse', 'У браслеті'], ...Object.entries(INTENTS)].map(([k, label]) => {
   const b = el('button', { type: 'button', textContent: label }); b.dataset.k = k;
   b.addEventListener('click', () => { filter = k; renderPalette(); });
   return b;
@@ -1067,6 +1160,7 @@ $('#t-left').addEventListener('click', () => move(-1));
 $('#t-right').addEventListener('click', () => move(1));
 $('#t-del').addEventListener('click', removeSel);
 $('#t-undo').addEventListener('click', undo);
+$('#t-redo').addEventListener('click', redo);
 $('#t-clear').addEventListener('click', () => { if (!state.items.length) return; commit(() => { state.items = []; state.sel = -1; }); toast('Браслет очищено', true); });
 $('#a-repeat').addEventListener('click', () => {
   if (!state.items.some(i => i.k !== 'ch')) { toast('Спершу додайте кілька каменів'); return; }
@@ -1085,12 +1179,20 @@ $('#gift').addEventListener('change', e => { state.gift = e.target.checked; rend
 
 /* ---------- render ---------- */
 function renderPalette() {
-  $('#filters').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === filter)));
+  const used = new Set(state.items.filter(i => i.k === 's').map(i => i.id));
+  $('#filters').querySelectorAll('button').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.k === filter));
+    if (b.dataset.k === 'inuse') b.textContent = `У браслеті (${used.size})`;
+  });
+  $('#colors').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === colorF)));
+  let shown = 0;
   palette.querySelectorAll('.stone').forEach(b => {
     const s = STONE[b.dataset.id];
-    b.hidden = filter !== 'all' && !s.intents.includes(filter);
-    b.querySelector('small').textContent = `${beadPrice(s.id)} грн / шт`;
+    b.hidden = (filter === 'inuse' ? !used.has(s.id) : filter !== 'all' && !s.intents.includes(filter)) || (colorF !== 'all' && COLOR_OF[s.id] !== colorF);
+    if (!b.hidden) shown++;
+    b.querySelector('small').textContent = `${state.size} мм · ${beadPrice(s.id)} грн`;
   });
+  $('#empty').hidden = shown > 0;
 }
 function renderInfo() {
   const s = STONE[infoId];
@@ -1112,11 +1214,11 @@ function priceLines() {
   const M = METALS[state.metal], lines = [], stones = new Map();
   let sp = 0; const charms = new Map();
   state.items.forEach(it => {
-    if (it.k === 's') stones.set(it.id, (stones.get(it.id) || 0) + 1);
+    if (it.k === 's') { const key = it.id + ':' + it.d; stones.set(key, (stones.get(key) || 0) + 1); }
     else if (it.k === 'sp') sp++;
     else charms.set(it.id, (charms.get(it.id) || 0) + 1);
   });
-  stones.forEach((n, id) => lines.push([`${STONE[id].name}, ${state.size} мм × ${n}`, beadPrice(id) * n]));
+  stones.forEach((n, key) => { const [id, d] = key.split(':'); lines.push([`${STONE[id].name}, ${d} мм × ${n}`, beadPrice(id, +d) * n]); });
   if (sp) lines.push([`Розділювач, ${M.short} × ${sp}`, M.spacer * sp]);
   charms.forEach((n, id) => lines.push([`Підвіска «${CHARM[id].name}», ${M.short}${n > 1 ? ' × ' + n : ''}`, M.charm * n]));
   if (state.items.length) lines.push(['Еластична нитка і збирання', BASE]);
@@ -1128,34 +1230,36 @@ function fillLines(host, lines) {
 }
 function render() {
   const tgt = target(), total = lengthOf(state.items), n = stoneCount();
-  $('#wrist').value = state.wrist;
-  $('#wristout').textContent = `${cm(state.wrist)} см`;
+  syncWheel();
+  $('#wristout').textContent = `Довжина браслета ${cm(tgt)} см, посадка ${FITS.find(f => f.v === state.fit).adj}`;
   ['#fitseg', '#sizeseg', '#metalseg'].forEach(s => $(s)._sync());
   $('#gift').checked = state.gift;
   // status
   const st = $('#status'), rem = tgt - total;
-  if (!state.items.length) { st.className = 'chip idle'; st.textContent = 'Порожній браслет'; }
-  else if (total > tgt + 0.01) { st.className = 'chip warn'; st.textContent = `Довший на ${Math.round(total - tgt)} мм`; }
-  else if (rem < state.size) { st.className = 'chip ok'; st.textContent = 'Браслет заповнено'; }
-  else { const k = Math.floor(rem / state.size); st.className = 'chip idle'; st.textContent = `Місце ще для ${k} ${plural(k, 'бусини', 'бусин', 'бусин')}`; }
-  $('#lenline').textContent = `${cm(total)} з ${cm(tgt)} см`;
+  if (!state.items.length) { st.className = 'chip idle'; st.textContent = `Потрібно ${cm(tgt)} см бусин`; }
+  else if (total > tgt + TOL) { st.className = 'chip warn'; st.textContent = `Довший на ${Math.round(total - tgt)} мм, приберіть бусину`; }
+  else if (rem < MIN_D) { st.className = 'chip ok'; st.textContent = 'Розмір підходить'; }
+  else { st.className = 'chip add'; st.textContent = `Додайте ще ${cm(rem)} см`; }
   // selection
   const cur = state.items[state.sel];
   const si = $('#selinfo');
   if (!cur) si.textContent = 'Перетягніть бусину, щоб змінити порядок, або в центр, щоб видалити. Натисніть, щоб вибрати.';
-  else if (cur.k === 's') si.innerHTML = `Вибрано: <b>${STONE[cur.id].name}</b>, ${state.size} мм, ${beadPrice(cur.id)} грн. Натисніть інший камінь, щоб замінити.`;
+  else if (cur.k === 's') si.innerHTML = `Вибрано: <b>${STONE[cur.id].name}</b>, ${cur.d} мм, ${beadPrice(cur.id, cur.d)} грн. Натисніть інший камінь, щоб замінити.`;
   else if (cur.k === 'sp') si.innerHTML = `Вибрано: <b>розділювач</b>, ${METALS[state.metal].short}.`;
   else si.innerHTML = `Вибрано: <b>підвіска «${CHARM[cur.id].name}»</b>, ${METALS[state.metal].short}.`;
   $('#t-left').disabled = !cur || state.sel === 0;
   $('#t-right').disabled = !cur || state.sel === state.items.length - 1;
   $('#t-del').disabled = !cur;
   $('#t-undo').disabled = !history.length;
+  $('#t-redo').disabled = !future.length;
   $('#mode').innerHTML = cur && cur.k === 's' ? '<b>Заміна вибраної бусини</b>' : cur ? 'Камінь додасться після вибраного' : 'Камінь додається в кінець';
   // price
   const lines = priceLines(), sum = lines.reduce((a, l) => a + l[1], 0);
   fillLines($('#lines'), lines);
   $('#total').textContent = uah(sum);
   $('#mtotal').textContent = uah(sum);
+  $('#tabprice').textContent = uah(sum);
+  $('#hudtotal').textContent = `${n} ${plural(n, 'бусина', 'бусини', 'бусин')} · ${uah(sum)}`;
   $('#msub').textContent = `${n} ${plural(n, 'бусина', 'бусини', 'бусин')} · ${cm(total)} см`;
   renderPalette(); renderInfo(); draw(); renderRecap(lines);
   try { localStorage.setItem(KEY, JSON.stringify({ wrist: state.wrist, fit: state.fit, size: state.size, metal: state.metal, gift: state.gift, items: state.items })); } catch (e) {}
@@ -1172,12 +1276,12 @@ function renderRecap(lines) {
 function orderText(sum) {
   const v = id => $(id).value.trim();
   const fit = FITS.find(f => f.v === state.fit);
-  const seq = state.items.map(it => it.k === 's' ? STONE[it.id].name : it.k === 'sp' ? 'розділювач' : `підвіска «${CHARM[it.id].name}»`).join(' → ');
+  const seq = state.items.map(it => it.k === 's' ? `${STONE[it.id].name} ${it.d} мм` : it.k === 'sp' ? 'розділювач' : `підвіска «${CHARM[it.id].name}»`).join(' → ');
   return [
     'Замовлення браслета Air Chains',
     '',
-    `Обхват зап’ястка: ${cm(state.wrist)} см, посадка: ${fit.label.toLowerCase()} (${fit.sub})`,
-    `Довжина: ${cm(lengthOf(state.items))} см, бусини ${state.size} мм, метал: ${METALS[state.metal].name}`,
+    `Обхват зап’ястка: ${cm(state.wrist)} см, посадка ${fit.adj} (${fit.sub})`,
+    `Довжина: ${cm(lengthOf(state.items))} см, бусини ${sizesLabel()}, метал: ${METALS[state.metal].name}`,
     '',
     'Послідовність від застібки за годинниковою стрілкою:',
     seq,
@@ -1215,7 +1319,7 @@ $('#copy-dm').addEventListener('click', () => copyOrder(true));
 /* ---------- catalogue & size table ---------- */
 $('#catalog').replaceChildren(...STONES.map(s => {
   const dl = el('dl');
-  [['Твердість', s.mohs + ' за Моосом'], ['Походження', s.origin], ['Бусина 8 мм', `${s.price} грн`]].forEach(([t, d]) => dl.append(el('dt', { textContent: t }), el('dd', { textContent: d })));
+  [['Твердість', s.mohs + ' за Моосом'], ['Походження', s.origin], ['6 / 8 / 10 мм', `${[6, 8, 10].map(d => beadPrice(s.id, d)).join(' / ')} грн`]].forEach(([t, d]) => dl.append(el('dt', { textContent: t }), el('dd', { textContent: d })));
   const add = el('button', { type: 'button', className: 'add', textContent: 'Додати в браслет' });
   add.addEventListener('click', () => { state.sel = -1; addStone(s.id); toast(`${s.name}: додано в браслет`); });
   return el('article', { className: 'card' }, [
@@ -1247,12 +1351,26 @@ try {
   const s = JSON.parse(localStorage.getItem(KEY) || 'null');
   if (s && Array.isArray(s.items) && SIZES[s.size] && METALS[s.metal] && FITS.some(f => f.v === s.fit)) {
     const items = s.items.filter(it => (it.k === 's' && STONE[it.id]) || it.k === 'sp' || (it.k === 'ch' && CHARM[it.id]));
-    Object.assign(state, { wrist: Math.min(210, Math.max(130, +s.wrist || 160)), fit: s.fit, size: s.size, metal: s.metal, gift: !!s.gift, items });
+    items.forEach(it => { if (it.k === 's' && !SIZES[it.d]) it.d = s.size; });
+    Object.assign(state, { wrist: WRISTS.includes(+s.wrist) ? +s.wrist : 160, fit: s.fit, size: s.size, metal: s.metal, gift: !!s.gift, items });
     loaded = items.length > 0;
   }
 } catch (e) {}
 if (!loaded) applyPreset(PRESETS[0]);
 buildAddons();
+/* mobile tabs: one step at a time under the board */
+function setTab(t, fromUser) {
+  tab = t;
+  document.querySelectorAll('.panel > [data-tab]').forEach(g => g.classList.toggle('on', g.dataset.tab === t));
+  document.querySelectorAll('#tabbar button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.t === t)));
+  if (t === 'size') requestAnimationFrame(syncWheel);
+  const panel = $('.panel');
+  const top = panel.getBoundingClientRect().top;
+  if (fromUser && (top < 0 || top > innerHeight - 200)) $('#constructor').scrollIntoView({ block: 'start' });
+}
+document.querySelectorAll('#tabbar button').forEach(b => b.addEventListener('click', () => setTab(b.dataset.t, true)));
+setTab(tab);
+if ('IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => document.body.classList.toggle('in-cfg', e.isIntersecting)), { rootMargin: '0px 0px -45% 0px' }).observe($('#constructor'));
 render();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
 })();
