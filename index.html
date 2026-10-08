@@ -1524,7 +1524,9 @@ try {
   if (s && Array.isArray(s.items) && SIZES[s.size] && METALS[s.metal] && FITS.some(f => f.v === s.fit)) {
     const items = s.items.filter(it => (it.k === 's' && STONE[it.id]) || it.k === 'sp' || (it.k === 'ch' && CHARM[it.id]));
     items.forEach(it => { if (it.k === 's' && !SIZES[it.d]) it.d = s.size; });
-    Object.assign(state, { wrist: WRISTS.includes(+s.wrist) ? +s.wrist : 160, fit: s.fit, size: s.size, metal: s.metal, gift: !!s.gift, items });
+    // everyone starts at 16 cm, comfortable fit and 8 mm beads; saved beads are kept and trimmed to fit if needed
+    Object.assign(state, { wrist: 160, fit: 15, size: 8, metal: s.metal, gift: !!s.gift, items });
+    state.items = trim(items);
     loaded = items.length > 0;
   }
 } catch (e) {}
