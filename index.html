@@ -1316,15 +1316,11 @@ function renderRecap(lines) {
 function orderText(sum) {
   const v = id => $(id).value.trim();
   const fit = FITS.find(f => f.v === state.fit);
-  const seq = state.items.map(it => it.k === 's' ? `${STONE[it.id].name} ${it.d} мм` : it.k === 'sp' ? 'розділювач' : `підвіска «${CHARM[it.id].name}»`).join(' → ');
   return [
     'Замовлення браслета Air Chains',
     '',
     `Обхват зап’ястка: ${cm(state.wrist)} см, посадка ${fit.adj} (${fit.sub})`,
     `Довжина: ${cm(lengthOf(state.items))} см, бусини ${sizesLabel()}, метал: ${METALS[state.metal].name}`,
-    '',
-    'Послідовність від застібки за годинниковою стрілкою:',
-    seq,
     '',
     'Склад:',
     ...priceLines().map(([a, b]) => `· ${a}: ${uah(b)}`),
