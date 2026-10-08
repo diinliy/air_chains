@@ -48,10 +48,8 @@
 }
 :is(.cta, .tbtn, .stone, .addon, .preset, .filters button, .colors button, .seg button, .card .add, .tabbar button):active { transform: scale(.96); }
 @keyframes viewin { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-@keyframes menuin { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: no-preference) {
   .view:not([hidden]) { animation: viewin .4s cubic-bezier(.2, .7, .2, 1) both; }
-  body.menu-open .nav { animation: menuin .24s cubic-bezier(.2, .7, .2, 1) both; }
 }
 /* quick repeated taps (adding beads) must not trigger double-tap zoom; pinch zoom still works */
 html, body, button, a, input, select, textarea, label, canvas { touch-action: manipulation; }
@@ -82,13 +80,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .navcount { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 8px; border-radius: 999px; background: var(--btn); color: var(--btn-ink); font: 600 11px/1 var(--mono); vertical-align: 3px; letter-spacing: 0; }
 .menubtn .navcount { position: absolute; top: -2px; left: 18px; margin: 0; }
 /* the menu drops down under the header on every screen size */
-.nav { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; padding: 4px max(16px, calc((100% - 1200px) / 2 + clamp(16px, 4vw, 40px))) 20px; background: var(--bg); border-bottom: 1px solid var(--line); box-shadow: 0 24px 34px -28px rgba(0,0,0,.4); }
-body.menu-open .nav { display: flex; }
-.nav a, .nav .themerow { font: 400 28px/1.2 var(--display); color: var(--ink); text-decoration: none; padding: 13px 0; border-bottom: 1px solid var(--line); text-align: left; }
+.nav { display: flex; visibility: hidden; pointer-events: none; clip-path: inset(0 0 100% 0); transition: clip-path .45s cubic-bezier(.22, .8, .24, 1), visibility 0s linear .45s; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; padding: 4px max(16px, calc((100% - 1200px) / 2 + clamp(16px, 4vw, 40px))) 20px; background: var(--bg); border-bottom: 1px solid var(--line); box-shadow: 0 24px 34px -28px rgba(0,0,0,.4); }
+body.menu-open .nav { visibility: visible; pointer-events: auto; clip-path: inset(0 0 -40px 0); transition: clip-path .5s cubic-bezier(.22, .8, .24, 1), visibility 0s; }
+.nav > * { opacity: 0; transform: translateY(-8px); transition: opacity .25s ease, transform .3s ease; }
+body.menu-open .nav > * { opacity: 1; transform: none; transition: opacity .4s ease, transform .45s cubic-bezier(.22, .8, .24, 1); }
+body.menu-open .nav > :nth-child(1) { transition-delay: .05s; } body.menu-open .nav > :nth-child(2) { transition-delay: .09s; }
+body.menu-open .nav > :nth-child(3) { transition-delay: .13s; } body.menu-open .nav > :nth-child(4) { transition-delay: .17s; }
+body.menu-open .nav > :nth-child(5) { transition-delay: .21s; } body.menu-open .nav > :nth-child(6) { transition-delay: .25s; }
+.menubtn svg path { transition: transform .35s ease; transform-origin: 12px 12px; }
+.nav a { font: 400 28px/1.2 var(--display); color: var(--ink); text-decoration: none; padding: 13px 0; border-bottom: 1px solid var(--line); text-align: left; }
 .nav a:hover { color: var(--accent); }
 .nav a[aria-current="page"] { color: var(--accent); }
-.nav .themerow { display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 0; background: none; width: 100%; cursor: pointer; font: 500 15px var(--body); color: var(--muted); padding-top: 18px; }
-.nav .themerow svg { width: 20px; height: 20px; }
+.nav .themerow { display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; width: 44px; height: 44px; margin-top: 10px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; color: var(--ink); }
+.nav .themerow:hover { background: var(--surface); }
+.nav .themerow svg { width: 22px; height: 22px; }
 @media (max-width: 520px) { .logo .wordmark { height: 18px; } }
 
 /* hero */
@@ -358,7 +363,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       <a href="#bracelets" data-nav="bracelets">Готові браслети</a>
       <a href="#stones" data-nav="stones">Камені</a>
       <a href="#info" data-nav="info">Допомога</a>
-      <button class="themerow" id="theme" type="button"><span id="themelabel">Темна тема</span><span id="themeicon"></span></button>
+      <button class="themerow" id="theme" type="button" aria-label="Темна тема"><span id="themeicon"></span></button>
     </nav>
   </div>
 </header>
@@ -1570,7 +1575,7 @@ const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 function applyTheme(t, persist) {
   document.documentElement.setAttribute('data-theme', t);
   if (persist) { try { localStorage.setItem('ac-theme', t); } catch (e) {} }
-  $('#themeicon').innerHTML = t === 'dark' ? SUN : MOON; $('#themelabel').textContent = t === 'dark' ? 'Світла тема' : 'Темна тема';
+  $('#themeicon').innerHTML = t === 'dark' ? SUN : MOON; $('#theme').setAttribute('aria-label', t === 'dark' ? 'Світла тема' : 'Темна тема');
   readTheme();
   document.querySelectorAll('canvas').forEach(c => c._redraw && c._redraw());
 }
@@ -1659,7 +1664,7 @@ function route() {
 function closeMenu() { document.body.classList.remove('menu-open'); $('#menubtn').setAttribute('aria-expanded', 'false'); }
 $('#menubtn').addEventListener('click', () => { const open = !document.body.classList.contains('menu-open'); document.body.classList.toggle('menu-open', open); $('#menubtn').setAttribute('aria-expanded', String(open)); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
-document.addEventListener('click', e => { if (document.body.classList.contains('menu-open') && !e.target.closest('.top')) closeMenu(); });
+document.addEventListener('click', e => { if (document.body.classList.contains('menu-open') && e.target.isConnected && !e.target.closest('.top')) closeMenu(); });
 // a link to the section you are already on still scrolls back to its top
 document.addEventListener('click', e => { const a = e.target.closest('a[href^="#"]'); if (a && a.getAttribute('href') === location.hash) { e.preventDefault(); route(); } });
 window.addEventListener('hashchange', route);
