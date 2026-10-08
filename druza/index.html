@@ -1,0 +1,1145 @@
+<title>Друза</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a jeweller's bead board (dark flocked tray with a cm ruler) beside a control column; catalogue and reference sections below. */
+:root {
+  --bg: #EDEFEC;
+  --surface: #F8F9F7;
+  --ink: #1C2321;
+  --muted: #59645F;
+  --line: #D2D8D4;
+  --accent: #7A5B22;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E7DFCC;
+  --ok: #2E7A4D;
+  --warn: #A4521A;
+  --board: #1E2A26;
+  --board-ink: #E9EFEB;
+  --display: "Forum", "Cormorant Garamond", "Times New Roman", serif;
+  --body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111614; --surface: #18201D; --ink: #E5EBE7; --muted: #95A29C; --line: #2A3430;
+    --accent: #D3AF6B; --accent-ink: #1A1408; --accent-soft: #3A3223; --ok: #7CC79A; --warn: #E59B60;
+    --board: #1A2420; --board-ink: #E9EFEB; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111614; --surface: #18201D; --ink: #E5EBE7; --muted: #95A29C; --line: #2A3430;
+  --accent: #D3AF6B; --accent-ink: #1A1408; --accent-soft: #3A3223; --ok: #7CC79A; --warn: #E59B60;
+  --board: #1A2420; --board-ink: #E9EFEB; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.08; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 40px); }
+.label { font: 600 11px/1.3 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.logo { font-family: var(--display); font-size: 28px; letter-spacing: .02em; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.logo svg { width: 22px; height: 22px; }
+.nav { display: flex; gap: 22px; }
+.nav a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; }
+.nav a:hover { color: var(--ink); }
+@media (max-width: 760px) { .nav a:not(.keep) { display: none; } }
+
+/* hero */
+.hero { padding-block: clamp(28px, 5vw, 56px) 28px; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 32px; align-items: end; }
+.hero h1 { font-size: clamp(38px, 6vw, 68px); }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p { color: var(--muted); max-width: 46ch; font-size: 16px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 18px; }
+.facts div { display: grid; gap: 2px; }
+.facts b { font: 400 26px/1 var(--display); }
+.facts span { font-size: 12px; color: var(--muted); }
+@media (max-width: 820px) { .hero { grid-template-columns: 1fr; gap: 14px; } }
+
+/* configurator */
+.cfg { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: start; padding-block: 8px 56px; }
+.stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); display: grid; gap: 12px; }
+.boardwrap { position: relative; width: 100%; max-width: 620px; aspect-ratio: 1; border-radius: 22px; overflow: hidden; background: var(--board); box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px -24px rgba(0,0,0,.6); }
+#board { width: 100%; height: 100%; display: block; touch-action: manipulation; cursor: pointer; }
+.statusrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; max-width: 620px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--surface); border: 1px solid var(--line); }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.ok { color: var(--ok); } .chip.warn { color: var(--warn); } .chip.idle { color: var(--muted); }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; max-width: 620px; }
+.tbtn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 7px 11px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.tbtn:hover:not(:disabled) { border-color: var(--ink); }
+.tbtn:disabled { opacity: .4; cursor: default; }
+.tbtn svg { width: 15px; height: 15px; }
+.sel { min-height: 22px; font-size: 13px; color: var(--muted); max-width: 620px; }
+.sel b { color: var(--ink); font-weight: 600; }
+.panel { display: grid; gap: 26px; min-width: 0; }
+.group { display: grid; gap: 12px; }
+.group > header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.group h2 { font-size: 26px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; border-radius: 9px; padding: 7px 12px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); display: grid; line-height: 1.2; text-align: left; }
+.seg button small { font-weight: 500; font-size: 11px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.wrist { display: grid; gap: 6px; flex: 1 1 240px; min-width: 0; }
+.wrist .top-line { display: flex; justify-content: space-between; align-items: baseline; }
+.wrist output { font: 500 18px var(--mono); }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.filters button { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 4px 11px; font-size: 13px; cursor: pointer; color: var(--muted); }
+.filters button[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); background: var(--surface); }
+.mode { font-size: 13px; color: var(--muted); }
+.mode b { color: var(--accent); font-weight: 600; }
+.palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 6px; }
+.stone { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 6px; border-radius: 12px; border: 1px solid transparent; background: transparent; cursor: pointer; text-align: left; min-width: 0; }
+.stone:hover, .stone:focus-visible { background: var(--surface); border-color: var(--line); }
+.stone canvas { width: 34px; height: 34px; flex: none; }
+.stone span { display: grid; min-width: 0; line-height: 1.25; }
+.stone b { font-weight: 600; font-size: 13.5px; }
+.stone small { color: var(--muted); font-size: 12px; font-family: var(--mono); }
+.stone[hidden] { display: none !important; }
+.info { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; padding: 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); align-items: start; }
+.info canvas { width: 56px; height: 56px; }
+.info h3 { font-size: 22px; }
+.info p { font-size: 13.5px; color: var(--muted); margin-top: 4px; }
+.info dl { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 8px 0 0; font-size: 12px; }
+.info dt { color: var(--muted); display: inline; }
+.info dd { display: inline; margin: 0 0 0 4px; font-family: var(--mono); }
+.addons { display: flex; flex-wrap: wrap; gap: 6px; }
+.addon { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 6px 12px 6px 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.addon:hover { border-color: var(--ink); }
+.addon canvas { width: 26px; height: 26px; }
+.addon small { color: var(--muted); font: 400 12px var(--mono); }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.preset { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 4px 12px 4px 5px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.preset:hover { background: var(--surface); }
+.preset canvas { width: 46px; height: 18px; }
+.summary { border-top: 1px solid var(--line); padding-top: 18px; display: grid; gap: 12px; }
+.lines { display: grid; gap: 4px; font-size: 13.5px; }
+.lines div { display: flex; justify-content: space-between; gap: 12px; }
+.lines span:first-child { color: var(--muted); min-width: 0; }
+.lines span:last-child { font-family: var(--mono); white-space: nowrap; }
+.total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.total strong { font: 400 40px/1 var(--display); }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; cursor: pointer; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.cta { display: inline-flex; justify-content: center; align-items: center; gap: 8px; border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 12px; padding: 13px 22px; font-weight: 700; font-size: 15px; cursor: pointer; text-decoration: none; }
+.cta:hover { filter: brightness(1.08); }
+.cta.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+@media (max-width: 900px) {
+  .cfg { grid-template-columns: 1fr; }
+  .stage { position: static; }
+  .boardwrap { margin-inline: auto; }
+}
+
+/* sections */
+.sec { padding-block: 56px; border-top: 1px solid var(--line); }
+.sec > header { display: flex; justify-content: space-between; align-items: end; gap: 12px 24px; flex-wrap: wrap; margin-bottom: 28px; }
+.sec h2 { font-size: clamp(32px, 4.4vw, 48px); }
+.sec > header p { color: var(--muted); max-width: 52ch; }
+
+.order { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+.form { display: grid; gap: 14px; }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; }
+.field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 11px 12px; }
+.field textarea { min-height: 84px; resize: vertical; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.err { color: var(--warn); font-size: 13px; min-height: 18px; }
+.recap { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 14px; align-content: start; }
+.recap canvas { width: 100%; max-width: 320px; aspect-ratio: 1; border-radius: 14px; justify-self: center; }
+.result { display: grid; gap: 10px; }
+.result textarea { width: 100%; min-height: 220px; font: 12.5px/1.5 var(--mono); border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--bg); }
+.note { font-size: 12.5px; color: var(--muted); }
+@media (max-width: 820px) { .order, .pair { grid-template-columns: 1fr; } }
+
+.catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.card { background: var(--bg); padding: 20px; display: grid; gap: 10px; align-content: start; }
+.card .head { display: flex; gap: 14px; align-items: center; }
+.card canvas { width: 64px; height: 64px; flex: none; }
+.card h3 { font-size: 24px; }
+.card .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.card .tags span { font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 2px 7px; }
+.card p { font-size: 13.5px; color: var(--muted); }
+.card dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; font-size: 12.5px; }
+.card dt { color: var(--muted); }
+.card dd { margin: 0; font-family: var(--mono); }
+.card .add { justify-self: start; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.card .add:hover { border-color: var(--ink); }
+
+.measure { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 32px; align-items: start; }
+.steps { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; counter-increment: s; }
+.steps li::before { content: counter(s); font: 400 26px/1 var(--display); color: var(--accent); }
+.steps b { display: block; font-weight: 600; margin-bottom: 2px; }
+.steps span { color: var(--muted); font-size: 14px; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 420px; }
+th, td { padding: 9px 14px; text-align: right; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--surface); }
+td { font-family: var(--mono); }
+tbody tr:last-child td { border-bottom: 0; }
+@media (max-width: 820px) { .measure { grid-template-columns: 1fr; } }
+
+.process { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 0; list-style: none; counter-reset: p; }
+.process li { counter-increment: p; display: grid; gap: 8px; align-content: start; padding-top: 14px; border-top: 1px solid var(--ink); }
+.process li::before { content: "0" counter(p); font: 500 12px var(--mono); color: var(--muted); }
+.process b { font: 400 22px/1.15 var(--display); }
+.process span { color: var(--muted); font-size: 14px; }
+@media (max-width: 900px) { .process { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .process { grid-template-columns: 1fr; } }
+
+.faq { display: grid; gap: 0; border-top: 1px solid var(--line); max-width: 820px; }
+.faq details { border-bottom: 1px solid var(--line); padding-block: 14px; }
+.faq summary { cursor: pointer; font-weight: 600; font-size: 16px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+.faq summary::after { content: "+"; font: 400 22px/1 var(--display); color: var(--accent); }
+.faq details[open] summary::after { content: "−"; }
+.faq p { color: var(--muted); margin-top: 8px; max-width: 65ch; }
+
+footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: 13px; }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+.mbar { display: none; }
+@media (max-width: 900px) {
+  .mbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--surface); border-top: 1px solid var(--line); }
+  .mbar strong { font: 400 26px/1 var(--display); }
+  .mbar small { display: block; color: var(--muted); font-size: 12px; }
+  .mbar .cta { padding: 11px 18px; }
+  body { padding-bottom: 76px; }
+}
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 40; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); display: flex; gap: 12px; align-items: center; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast button { border: 0; background: transparent; color: var(--accent-soft); font-weight: 700; cursor: pointer; padding: 0; }
+@media (max-width: 900px) { .toast { bottom: calc(90px + env(safe-area-inset-bottom, 0px)); } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#constructor" aria-label="Друза, на початок">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 2 L17 8 L12 22 L7 8 Z"/><path d="M7 8 H17"/><path d="M4 10 L7 8 M20 10 L17 8 M4 10 L12 22 L20 10"/></svg>
+      Друза
+    </a>
+    <nav class="nav" aria-label="Розділи">
+      <a class="keep" href="#constructor">Конструктор</a>
+      <a href="#stones">Камені</a>
+      <a href="#size">Розмір</a>
+      <a href="#process">Як ми працюємо</a>
+      <a href="#faq">Питання</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero">
+    <div>
+      <p class="label">Натуральне каміння · ручне збирання</p>
+      <h1>Зберіть браслет із <em>каменів</em>, які обираєте самі</h1>
+    </div>
+    <div>
+      <p>Вкажіть обхват зап’ястка, оберіть камені та підвіски. Браслет одразу зʼявляється на дошці майстра, а ціна рахується по кожній бусині.</p>
+      <div class="facts">
+        <div><b>16</b><span>видів каменю</span></div>
+        <div><b>6–10 мм</b><span>розміри бусин</span></div>
+        <div><b>2 дні</b><span>на збирання</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="constructor" class="wrap cfg" aria-label="Конструктор браслета">
+    <div class="stage">
+      <div class="boardwrap" id="boardwrap">
+        <canvas id="board" tabindex="0" role="img" aria-label="Попередній перегляд браслета. Стрілки вибирають бусину, Delete видаляє."></canvas>
+      </div>
+      <div class="statusrow">
+        <span class="chip idle" id="status">—</span>
+        <span class="mono" id="lenline" style="font-size:13px;color:var(--muted)"></span>
+      </div>
+      <div class="sel" id="selinfo" aria-live="polite"></div>
+      <div class="tools">
+        <button class="tbtn" id="t-left" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg>Перемістити</button>
+        <button class="tbtn" id="t-right" type="button" disabled>Перемістити<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m6 3 5 5-5 5"/></svg></button>
+        <button class="tbtn" id="t-del" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h10M6 4V2.5h4V4M4.5 4l.7 9.5h5.6l.7-9.5"/></svg>Видалити</button>
+        <button class="tbtn" id="t-undo" type="button" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3 2 6l3 3"/><path d="M2 6h7.5a4 4 0 0 1 0 8H6"/></svg>Скасувати</button>
+        <button class="tbtn" id="t-clear" type="button">Очистити</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="group">
+        <header><h2>Розмір</h2><span class="label">довжина рахується сама</span></header>
+        <div class="row">
+          <div class="wrist">
+            <div class="top-line"><label for="wrist" style="font-size:13px;font-weight:600">Обхват зап’ястка</label><output id="wristout" for="wrist">16,0 см</output></div>
+            <input type="range" id="wrist" min="130" max="210" step="5" value="160">
+          </div>
+        </div>
+        <div class="row">
+          <div class="seg" id="fitseg" role="group" aria-label="Посадка"></div>
+          <div class="seg" id="sizeseg" role="group" aria-label="Діаметр бусин"></div>
+        </div>
+      </div>
+
+      <div class="group">
+        <header><h2>Камені</h2><span class="mode" id="mode"></span></header>
+        <div class="filters" id="filters" role="group" aria-label="Фільтр за значенням"></div>
+        <div class="palette" id="palette"></div>
+        <div class="info" id="info"></div>
+      </div>
+
+      <div class="group">
+        <header><h2>Метал і підвіски</h2><span class="label">до 3 підвісок</span></header>
+        <div class="seg" id="metalseg" role="group" aria-label="Метал фурнітури"></div>
+        <div class="addons" id="addons"></div>
+      </div>
+
+      <div class="group">
+        <header><h2>Швидкий старт</h2></header>
+        <div class="presets" id="presets"></div>
+        <div class="row">
+          <button class="tbtn" id="a-repeat" type="button">Заповнити повтором візерунка</button>
+          <button class="tbtn" id="a-shuffle" type="button">Перемішати камені</button>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="lines" id="lines"></div>
+        <label class="check"><input type="checkbox" id="gift"> Подарункова коробка з карткою значень каменів, +70 грн</label>
+        <div class="total"><span class="label">Разом</span><strong class="mono" style="font-family:var(--display)" id="total">0 грн</strong></div>
+        <a class="cta" href="#order" id="go-order">Оформити замовлення</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="order" class="wrap sec">
+    <header><h2>Оформлення</h2><p>Майстер перевірить композицію, підбере камені наживо і надішле фото до збирання.</p></header>
+    <div class="order">
+      <form class="form" id="form" novalidate>
+        <div class="pair">
+          <div class="field"><label for="f-name">Ім’я</label><input id="f-name" autocomplete="name" placeholder="Олена"></div>
+          <div class="field"><label for="f-phone">Телефон</label><input id="f-phone" type="tel" autocomplete="tel" placeholder="+380 67 000 00 00"></div>
+        </div>
+        <div class="pair">
+          <div class="field"><label for="f-ship">Доставка</label>
+            <select id="f-ship"><option>Нова Пошта, відділення</option><option>Нова Пошта, поштомат</option><option>Укрпошта</option></select>
+          </div>
+          <div class="field"><label for="f-city">Місто і номер відділення</label><input id="f-city" placeholder="Львів, №12"></div>
+        </div>
+        <div class="field"><label for="f-note">Коментар</label><textarea id="f-note" placeholder="Наприклад: хочу місячний камінь з сильнішим сяйвом"></textarea></div>
+        <p class="err" id="f-err" role="alert"></p>
+        <div class="row"><button class="cta" type="submit">Сформувати замовлення</button><a class="cta ghost" href="#constructor">Повернутися до браслета</a></div>
+        <p class="note">Це демо-версія сайту. Форма не надсилає дані, а формує текст замовлення, який можна скопіювати.</p>
+      </form>
+      <div class="recap" id="recap">
+        <canvas id="recapcv" aria-hidden="true"></canvas>
+        <div class="lines" id="recaplines"></div>
+        <div class="result" id="result" hidden>
+          <p class="label">Замовлення сформовано</p>
+          <textarea id="ordertext" readonly aria-label="Текст замовлення"></textarea>
+          <div class="row"><button class="cta" type="button" id="copy">Скопіювати текст</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stones" class="wrap sec">
+    <header><h2>Камені</h2><p>Значення каменів взяті з народної та літотерапевтичної традиції. Це символи, а не медичні властивості.</p></header>
+    <div class="catalog" id="catalog"></div>
+  </section>
+
+  <section id="size" class="wrap sec">
+    <header><h2>Як виміряти зап’ясток</h2></header>
+    <div class="measure">
+      <ol class="steps">
+        <li><div><b>Оберніть стрічку навколо зап’ястка</b><span>Сантиметрова стрічка або смужка паперу, одразу під кісточкою.</span></div></li>
+        <li><div><b>Не затягуйте</b><span>Стрічка має прилягати щільно, але без тиску. Запишіть число в сантиметрах.</span></div></li>
+        <li><div><b>Оберіть посадку</b><span>Конструктор сам додасть запас: 1 см для щільної посадки, 1,5 см для комфортної, 2 см для вільної.</span></div></li>
+      </ol>
+      <div class="tablewrap"><table id="sizetable"></table></div>
+    </div>
+  </section>
+
+  <section id="process" class="wrap sec">
+    <header><h2>Як ми працюємо</h2></header>
+    <ol class="process">
+      <li><b>Ви збираєте браслет</b><span>У конструкторі видно точну довжину, склад і ціну.</span></li>
+      <li><b>Підбираємо камені наживо</b><span>Кожен камінь природний, тому до збирання надсилаємо фото саме ваших бусин.</span></li>
+      <li><b>Збираємо за 2 дні</b><span>Міцна еластична нитка, подвійний вузол, сховано в бусині.</span></li>
+      <li><b>Відправляємо</b><span>Новою Поштою або Укрпоштою, у мішечку або подарунковій коробці.</span></li>
+    </ol>
+  </section>
+
+  <section id="faq" class="wrap sec">
+    <header><h2>Питання</h2></header>
+    <div class="faq">
+      <details><summary>Камені справді натуральні?</summary><p>Так. Тому відтінок і малюнок кожної бусини трохи відрізняються від зображення в конструкторі. Перед збиранням ми надсилаємо фото підібраних каменів.</p></details>
+      <details><summary>Що робити, якщо браслет не підійде за розміром?</summary><p>Протягом 14 днів перезберемо його під новий розмір. Оплачуєте лише доставку.</p></details>
+      <details><summary>Як доглядати за браслетом?</summary><p>Знімайте перед душем, басейном і спортом. Малахіт і говліт мʼякі (3,5–4 за шкалою Мооса), тож бережіть їх від ударів, парфумів і кремів.</p></details>
+      <details><summary>Можна поєднати бусини різних розмірів?</summary><p>Конструктор збирає браслет з одного розміру бусин. Якщо хочете змішати розміри, напишіть про це в коментарі до замовлення.</p></details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap"><span>Друза · браслети з натурального каміння</span><span>Демо-сайт. Ціни й тексти приблизні.</span></div>
+</footer>
+
+<div class="mbar" aria-hidden="false">
+  <div><strong id="mtotal">0 грн</strong><small id="msub"></small></div>
+  <a class="cta" href="#order">Оформити</a>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastmsg"></span><button type="button" id="toastundo" hidden>Скасувати</button></div>
+
+<script>
+(() => {
+const STONES = [
+  { id: 'amethyst', name: 'Аметист', price: 18, mohs: '7', origin: 'Бразилія, Уругвай', intents: ['calm', 'clarity'], meaning: 'Традиційно повʼязують зі спокоєм і ясною головою. Камінь для вечорів і сну.', look: { type: 'translucent', c: ['#E2C4F5', '#9A5FC8', '#4B2174'] } },
+  { id: 'rosequartz', name: 'Рожевий кварц', price: 16, mohs: '7', origin: 'Мадагаскар, Бразилія', intents: ['love', 'calm'], meaning: 'Камінь ніжності й турботи про себе. Найчастіше його обирають у подарунок.', look: { type: 'cloudy', c: ['#FDE6E9', '#F0AEBA', '#C27887'] } },
+  { id: 'crystal', name: 'Гірський кришталь', price: 15, mohs: '7', origin: 'Волинь, Україна', intents: ['clarity', 'energy'], meaning: 'Прозорий кварц. Додає композиції світла і підсилює сусідні камені.', look: { type: 'clear', c: ['#FFFFFF', '#DCE5EC', '#94A7B7'] } },
+  { id: 'moonstone', name: 'Місячний камінь', price: 32, mohs: '6–6,5', origin: 'Шрі-Ланка, Індія', intents: ['calm', 'love'], meaning: 'Має блакитне сяйво всередині. Камінь інтуїції та мʼякої сили.', look: { type: 'sheen', c: ['#F8F6F1', '#E2DDD2', '#B4AC9E'], accent: '#8FC1FF' } },
+  { id: 'labradorite', name: 'Лабрадорит', price: 28, mohs: '6–6,5', origin: 'Житомирщина, Україна', intents: ['protect', 'clarity'], meaning: 'Сірий камінь, що спалахує синім і зеленим під світлом. Оберіг від чужого впливу.', look: { type: 'flash', c: ['#8C9398', '#596267', '#2A3034'], accent: ['#3FA7FF', '#3CE0B0', '#E8C547'] } },
+  { id: 'tigereye', name: 'Тигрове око', price: 14, mohs: '7', origin: 'ПАР', intents: ['energy', 'protect'], meaning: 'Шовковисті золоті смуги, що переливаються. Камінь впевненості й рішучості.', look: { type: 'chatoyant', c: ['#E6AC4C', '#9E611C', '#46280B'], accent: '#FFD98A' } },
+  { id: 'onyx', name: 'Чорний онікс', price: 14, mohs: '6,5–7', origin: 'Бразилія', intents: ['protect', 'energy'], meaning: 'Глибокий чорний халцедон. Заземлює і допомагає тримати межі.', look: { type: 'solid', c: ['#3E3E41', '#141416', '#000000'] } },
+  { id: 'lapis', name: 'Лазурит', price: 30, mohs: '5–5,5', origin: 'Афганістан', intents: ['clarity'], meaning: 'Синій камінь із золотими вкрапленнями піриту. Камінь мудрості та чесної розмови.', look: { type: 'flecks', c: ['#4067CC', '#1F3B94', '#0E1D5A'], accent: '#E9C866', accent2: '#C6D2EE' } },
+  { id: 'aquamarine', name: 'Аквамарин', price: 38, mohs: '7,5–8', origin: 'Бразилія, Волинь', intents: ['calm', 'clarity'], meaning: 'Морський різновид берилу. Повʼязують зі спокоєм і легкістю в розмові.', look: { type: 'cloudy', c: ['#E8F7F9', '#A6D8E1', '#5AA2B2'] } },
+  { id: 'nephrite', name: 'Нефрит', price: 26, mohs: '6–6,5', origin: 'Канада', intents: ['calm', 'protect'], meaning: 'Щільний зелений камінь. Символ гармонії й довголіття.', look: { type: 'mottled', c: ['#82B077', '#3F7A4A', '#1C4228'], accent: '#ADD19B' } },
+  { id: 'amazonite', name: 'Амазоніт', price: 22, mohs: '6–6,5', origin: 'Перу, Мадагаскар', intents: ['calm', 'energy'], meaning: 'Бірюзовий польовий шпат із білими прожилками. Камінь надії.', look: { type: 'streaks', c: ['#ABE4D7', '#58BCAB', '#2A8276'], accent: '#EEFBF7' } },
+  { id: 'carnelian', name: 'Сердолік', price: 18, mohs: '7', origin: 'Індія', intents: ['energy', 'love'], meaning: 'Теплий помаранчевий халцедон. Камінь сміливості й творчості.', look: { type: 'translucent', c: ['#FFB57E', '#DE5F1E', '#8C2A07'] } },
+  { id: 'hematite', name: 'Гематит', price: 10, mohs: '5,5–6,5', origin: 'Бразилія', intents: ['protect', 'energy'], meaning: 'Важкий камінь з металевим блиском. Заземлює.', look: { type: 'metallic', c: ['#A3AAB1', '#4C5258', '#17191C'] } },
+  { id: 'rhodonite', name: 'Родоніт', price: 20, mohs: '5,5–6,5', origin: 'Австралія', intents: ['love'], meaning: 'Рожевий камінь із чорними прожилками. Камінь прощення і співчуття.', look: { type: 'veins', c: ['#F2A6AC', '#D06E7B', '#8A3946'], accent: '#24171A' } },
+  { id: 'malachite', name: 'Малахіт', price: 34, mohs: '3,5–4', origin: 'ДР Конго', intents: ['protect', 'energy'], meaning: 'Яскраво-зелені концентричні смуги. Традиційний оберіг мандрівників.', look: { type: 'bands', c: ['#55C78F', '#178A57', '#0A4A2C'], accent: '#06321D' } },
+  { id: 'howlite', name: 'Говліт', price: 10, mohs: '3,5', origin: 'США', intents: ['calm'], meaning: 'Білий камінь із сірими прожилками. Повʼязують із терпінням і тишею.', look: { type: 'veins', c: ['#FFFFFF', '#ECEBE6', '#C6C3BB'], accent: '#5F5E5B' } },
+];
+const STONE = Object.fromEntries(STONES.map(s => [s.id, s]));
+const INTENTS = { all: 'Усі', calm: 'Спокій', love: 'Любов', protect: 'Захист', energy: 'Енергія', clarity: 'Ясність' };
+const SIZES = { 6: 0.75, 8: 1, 10: 1.4 };
+const FITS = [{ v: 10, label: 'Щільно', sub: '+1 см' }, { v: 15, label: 'Комфортно', sub: '+1,5 см' }, { v: 20, label: 'Вільно', sub: '+2 см' }];
+const METALS = {
+  silver: { name: 'Срібло 925', short: 'срібло', c: ['#FBFCFD', '#C2C7CB', '#767C82'], spacer: 24, charm: 160 },
+  gold: { name: 'Позолота', short: 'позолота', c: ['#FFF1C2', '#D6A84C', '#80601B'], spacer: 30, charm: 190 },
+};
+const CHARMS = [{ id: 'moon', name: 'Місяць' }, { id: 'star', name: 'Зірка' }, { id: 'heart', name: 'Серце' }, { id: 'leaf', name: 'Листок' }];
+const CHARM = Object.fromEntries(CHARMS.map(c => [c.id, c]));
+const PRESETS = [
+  { name: 'Тиша', pattern: ['amethyst', 'moonstone', 'amethyst', 'crystal'], charm: 'moon' },
+  { name: 'Сила', pattern: ['tigereye', 'onyx', 'tigereye', 'hematite'] },
+  { name: 'Ніжність', pattern: ['rosequartz', 'rosequartz', 'crystal', 'rhodonite'], charm: 'heart' },
+  { name: 'Море', pattern: ['aquamarine', 'amazonite', 'S', 'lapis', 'amazonite', 'S'] },
+  { name: 'Українські камені', pattern: ['labradorite', 'crystal', 'labradorite', 'aquamarine'] },
+];
+const BASE = 90, GIFT = 70, TOL = 2, MAX_CHARMS = 3, SPACER_W = 3;
+const KEY = 'druza-design-v1';
+
+const state = { wrist: 160, fit: 15, size: 8, metal: 'silver', gift: false, items: [], sel: -1 };
+let filter = 'all', infoId = 'amethyst';
+const history = [];
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const el = (tag, props = {}, kids = []) => { const n = document.createElement(tag); Object.assign(n, props); kids.forEach(k => n.append(k)); return n; };
+const cm = mm => (mm / 10).toFixed(1).replace('.', ',');
+const uah = n => Math.round(n).toLocaleString('uk-UA') + ' грн';
+const plural = (n, a, b, c) => { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 12 || h > 14) ? b : c; };
+const rv = () => Math.floor(Math.random() * 6);
+const hash = s => { let h = 2166136261; for (const ch of s) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; };
+const normA = x => ((x + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+const target = () => state.wrist + state.fit;
+const width = it => it.k === 's' ? state.size : it.k === 'sp' ? SPACER_W : 0;
+const lengthOf = items => items.reduce((a, it) => a + width(it), 0);
+const beadPrice = id => Math.round(STONE[id].price * SIZES[state.size]);
+const stoneCount = () => state.items.filter(i => i.k === 's').length;
+const clone = it => ({ ...it });
+
+/* ---------- stone textures ---------- */
+const sprites = new Map();
+function stoneSprite(id, v) {
+  const k = id + ':' + v;
+  if (!sprites.has(k)) sprites.set(k, paintStone(STONE[id], v));
+  return sprites.get(k);
+}
+function paintStone(st, v) {
+  const S = 160, r = S / 2, c = document.createElement('canvas');
+  c.width = c.height = S;
+  const g = c.getContext('2d');
+  const rnd = mulberry(hash(st.id) + v * 7919 + 1);
+  const L = st.look, [cl, cm_, cd] = L.c;
+  const R = () => rnd() * S;
+  const blob = (x, y, rad, col, a) => {
+    const gr = g.createRadialGradient(x, y, 0, x, y, rad);
+    gr.addColorStop(0, rgba(col, a)); gr.addColorStop(1, rgba(col, 0));
+    g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+  };
+  const wisps = (n, col, a) => {
+    for (let i = 0; i < n; i++) {
+      g.strokeStyle = rgba(col, a * (0.5 + rnd() * 0.5)); g.lineWidth = 1 + rnd() * 3;
+      g.beginPath(); g.moveTo(R(), R()); g.bezierCurveTo(R(), R(), R(), R(), R(), R()); g.stroke();
+    }
+  };
+  const veins = (n, col) => {
+    for (let i = 0; i < n; i++) {
+      let x = R(), y = R(), a = rnd() * Math.PI * 2;
+      g.strokeStyle = rgba(col, 0.45 + rnd() * 0.45); g.lineWidth = 0.7 + rnd() * 2.6;
+      g.beginPath(); g.moveTo(x, y);
+      for (let s = 0; s < 26; s++) { a += (rnd() - 0.5) * 0.9; x += Math.cos(a) * 7; y += Math.sin(a) * 7; g.lineTo(x, y); }
+      g.stroke();
+    }
+  };
+  g.beginPath(); g.arc(r, r, r - 1, 0, Math.PI * 2); g.clip();
+  const base = g.createRadialGradient(r * (0.6 + rnd() * 0.3), r * (0.55 + rnd() * 0.3), r * 0.05, r, r, r * 1.05);
+  base.addColorStop(0, cl); base.addColorStop(0.55, cm_); base.addColorStop(1, cd);
+  g.fillStyle = base; g.fillRect(0, 0, S, S);
+  switch (L.type) {
+    case 'translucent':
+      for (let i = 0; i < 7; i++) blob(R(), R(), 20 + rnd() * 40, rnd() < 0.5 ? cl : cd, 0.35);
+      blob(r * 1.35, r * 1.4, r * 0.8, cl, 0.55); wisps(4, '#FFFFFF', 0.2); break;
+    case 'cloudy':
+      for (let i = 0; i < 9; i++) blob(R(), R(), 18 + rnd() * 40, '#FFFFFF', 0.3);
+      for (let i = 0; i < 4; i++) blob(R(), R(), 20 + rnd() * 30, cd, 0.25);
+      blob(r * 1.3, r * 1.4, r * 0.7, cl, 0.6); break;
+    case 'clear':
+      for (let i = 0; i < 5; i++) blob(R(), R(), 10 + rnd() * 30, cd, 0.28);
+      wisps(3, '#FFFFFF', 0.6);
+      g.strokeStyle = 'rgba(90,110,130,.35)'; g.lineWidth = 2;
+      g.beginPath(); g.arc(r, r, r * 0.82, 0.3 + rnd(), 2.4 + rnd()); g.stroke();
+      blob(r * 1.3, r * 1.35, r * 0.6, '#FFFFFF', 0.7); break;
+    case 'sheen':
+      for (let i = 0; i < 5; i++) blob(R(), R(), 20 + rnd() * 30, '#FFFFFF', 0.35);
+      g.save(); g.translate(r * (0.85 + rnd() * 0.35), r * (0.8 + rnd() * 0.35)); g.rotate(rnd() * 3); g.scale(1.6, 0.7);
+      blob(0, 0, r * 0.6, L.accent, 0.7); g.restore(); break;
+    case 'flash':
+      veins(5, cd);
+      g.save(); g.globalCompositeOperation = 'lighter';
+      for (let k = 0; k < 3; k++) {
+        g.save(); g.translate(S * 0.15 + R() * 0.7, S * 0.15 + R() * 0.7); g.rotate(rnd() * 3); g.scale(1.8, 0.6);
+        blob(0, 0, r * (0.35 + rnd() * 0.25), L.accent[(v + k) % 3], 0.5); g.restore();
+      }
+      g.restore(); break;
+    case 'chatoyant': {
+      g.save(); g.translate(r, r); g.rotate(-0.4 + rnd() * 0.8); g.translate(-r, -r);
+      let y = -30; const ph = rnd() * 6;
+      while (y < S + 30) {
+        const h = 3 + rnd() * 9;
+        g.fillStyle = rgba(rnd() < 0.5 ? cl : cd, 0.3 + rnd() * 0.3);
+        g.beginPath(); g.moveTo(-30, y);
+        for (let x = -30; x <= S + 30; x += 10) g.lineTo(x, y + Math.sin(x * 0.05 + ph) * 3);
+        for (let x = S + 30; x >= -30; x -= 10) g.lineTo(x, y + h + Math.sin(x * 0.05 + ph) * 3);
+        g.fill(); y += h;
+      }
+      const off = (rnd() - 0.5) * 40, lg = g.createLinearGradient(0, r + off - 26, 0, r + off + 26);
+      lg.addColorStop(0, rgba(L.accent, 0)); lg.addColorStop(0.5, rgba(L.accent, 0.75)); lg.addColorStop(1, rgba(L.accent, 0));
+      g.fillStyle = lg; g.fillRect(-30, r + off - 26, S + 60, 52); g.restore(); break;
+    }
+    case 'solid': blob(R(), R(), 40, cl, 0.18); break;
+    case 'flecks':
+      for (let i = 0; i < 6; i++) blob(R(), R(), 15 + rnd() * 30, L.accent2, 0.25);
+      for (let i = 0; i < 6; i++) blob(R(), R(), 15 + rnd() * 25, cd, 0.4);
+      for (let i = 0, n = 40 + rnd() * 30; i < n; i++) { g.fillStyle = rgba(L.accent, 0.6 + rnd() * 0.4); g.beginPath(); g.arc(R(), R(), 0.8 + rnd() * 2.4, 0, 7); g.fill(); }
+      break;
+    case 'mottled':
+      for (let i = 0; i < 14; i++) blob(R(), R(), 12 + rnd() * 35, rnd() < 0.5 ? L.accent : cd, 0.38); break;
+    case 'streaks':
+      for (let i = 0; i < 6; i++) blob(R(), R(), 15 + rnd() * 30, cd, 0.3);
+      for (let i = 0; i < 10; i++) {
+        const x = R(), y = R(), a = 0.5 + rnd() * 0.4, len = 20 + rnd() * 60;
+        g.strokeStyle = rgba(L.accent, 0.35 + rnd() * 0.4); g.lineWidth = 1 + rnd() * 3;
+        g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a) * len / 2 + rnd() * 10, y + Math.sin(a) * len / 2, x + Math.cos(a) * len, y + Math.sin(a) * len); g.stroke();
+      }
+      break;
+    case 'veins':
+      for (let i = 0; i < 6; i++) blob(R(), R(), 15 + rnd() * 30, rnd() < 0.5 ? cl : cd, 0.3);
+      veins(3 + Math.floor(rnd() * 3), L.accent); break;
+    case 'bands': {
+      const t = rnd() * Math.PI * 2, d = r * (0.7 + rnd() * 0.9), cx = r + Math.cos(t) * d, cy = r + Math.sin(t) * d, ph = rnd() * 6;
+      const cols = [cl, cm_, L.accent, cm_, cd, cl];
+      let rad = 3, k = 0;
+      while (rad < S * 2) {
+        const w = cols[k % cols.length] === L.accent ? 1 + rnd() * 2 : 3 + rnd() * 7;
+        g.strokeStyle = cols[k % cols.length]; g.lineWidth = w + 0.6;
+        g.beginPath();
+        for (let a = 0; a <= Math.PI * 2 + 0.05; a += 0.08) { const rr = rad + w / 2 + Math.sin(a * 5 + ph) * 2; g.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); }
+        g.stroke(); rad += w; k++;
+      }
+      break;
+    }
+    case 'metallic': {
+      const lg = g.createLinearGradient(0, 0, S, S);
+      lg.addColorStop(0.2, rgba(cl, 0)); lg.addColorStop(0.42, rgba(cl, 0.55)); lg.addColorStop(0.6, rgba(cl, 0));
+      g.fillStyle = lg; g.fillRect(0, 0, S, S); break;
+    }
+  }
+  const sh = g.createRadialGradient(r * 0.8, r * 0.72, r * 0.2, r, r, r);
+  sh.addColorStop(0, 'rgba(0,0,0,0)'); sh.addColorStop(0.7, 'rgba(0,0,0,0.08)'); sh.addColorStop(1, 'rgba(0,0,0,0.5)');
+  g.fillStyle = sh; g.fillRect(0, 0, S, S);
+  const glossy = L.type === 'metallic' || L.type === 'solid';
+  g.save(); g.translate(r * 0.62, r * 0.5); g.rotate(-0.6); g.scale(1.4, 0.8); blob(0, 0, r * 0.32, '#FFFFFF', glossy ? 0.85 : 0.6); g.restore();
+  blob(r * 0.58, r * 0.46, r * 0.08, '#FFFFFF', 0.9);
+  return c;
+}
+
+const charmSprites = new Map();
+function charmSprite(id, metal) {
+  const k = id + ':' + metal;
+  if (charmSprites.has(k)) return charmSprites.get(k);
+  const c = document.createElement('canvas'); c.width = c.height = 120;
+  const g = c.getContext('2d'), M = METALS[metal].c;
+  g.translate(10, 10); g.fillStyle = '#000';
+  if (id === 'moon') {
+    g.beginPath(); g.arc(50, 50, 42, 0, 7); g.fill();
+    g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.arc(68, 38, 35, 0, 7); g.fill();
+    g.globalCompositeOperation = 'source-over';
+  } else {
+    const p = new Path2D();
+    if (id === 'star') {
+      for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? 19 : 47; p.lineTo(50 + Math.cos(a) * rr, 53 + Math.sin(a) * rr); }
+      p.closePath();
+    } else if (id === 'heart') {
+      p.moveTo(50, 90); p.bezierCurveTo(12, 62, 2, 32, 26, 16); p.bezierCurveTo(38, 9, 48, 16, 50, 28); p.bezierCurveTo(52, 16, 62, 9, 74, 16); p.bezierCurveTo(98, 32, 88, 62, 50, 90);
+    } else {
+      p.moveTo(50, 4); p.quadraticCurveTo(94, 40, 50, 96); p.quadraticCurveTo(6, 40, 50, 4);
+    }
+    g.fill(p);
+  }
+  g.globalCompositeOperation = 'source-atop';
+  const lg = g.createLinearGradient(0, 0, 100, 100);
+  lg.addColorStop(0, M[0]); lg.addColorStop(0.45, M[1]); lg.addColorStop(1, M[2]);
+  g.fillStyle = lg; g.fillRect(-10, -10, 120, 120);
+  const hl = g.createRadialGradient(32, 28, 0, 32, 28, 30); hl.addColorStop(0, 'rgba(255,255,255,.75)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = hl; g.fillRect(-10, -10, 120, 120);
+  if (id === 'leaf') { g.strokeStyle = rgba(M[2], 0.8); g.lineWidth = 3; g.beginPath(); g.moveTo(50, 12); g.quadraticCurveTo(54, 50, 50, 90); g.stroke(); }
+  g.globalCompositeOperation = 'source-over';
+  charmSprites.set(k, c);
+  return c;
+}
+
+/* ---------- board drawing ---------- */
+const board = $('#board'), boardWrap = $('#boardwrap');
+let boardPx = 0, dpr = 1, geo = null, drag = null;
+let noise = null;
+function noisePattern(ctx) {
+  if (!noise) {
+    const c = document.createElement('canvas'); c.width = c.height = 140;
+    const g = c.getContext('2d'), rnd = mulberry(7);
+    for (let i = 0; i < 2600; i++) { g.fillStyle = rnd() < 0.5 ? `rgba(255,255,255,${0.02 + rnd() * 0.04})` : `rgba(0,0,0,${0.05 + rnd() * 0.08})`; g.fillRect(rnd() * 140, rnd() * 140, 1, 1); }
+    noise = c;
+  }
+  return ctx.createPattern(noise, 'repeat');
+}
+function geometry(S) {
+  const cx = S / 2, cy = S / 2, R = S * 0.34, tgt = target(), ppm = 2 * Math.PI * R / tgt;
+  let cum = 0;
+  const lay = state.items.map((it, i) => { const w = width(it); const o = { it, i, w, s: cum + w / 2 }; cum += w; return o; });
+  const total = cum, off = total < tgt ? (tgt - total) / 2 : 0;
+  lay.forEach(o => { o.a = -Math.PI / 2 + (o.s + off) * ppm / R; });
+  return { S, cx, cy, R, tgt, ppm, total, lay };
+}
+function rrect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function charmAnchor(G, o) { const d = state.size, rr = G.R - (d / 2 + 4.2 + 6) * G.ppm; return { x: G.cx + Math.cos(o.a) * rr, y: G.cy + Math.sin(o.a) * rr, r: 6.5 * G.ppm }; }
+
+function drawItem(ctx, G, o, x, y, alpha = 1) {
+  const { ppm } = G, it = o.it, d = state.size;
+  ctx.save(); ctx.globalAlpha = alpha;
+  if (it.k === 's') {
+    const px = d * ppm;
+    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = px * 0.2; ctx.shadowOffsetX = px * 0.05; ctx.shadowOffsetY = px * 0.1;
+    ctx.drawImage(stoneSprite(it.id, it.v), x - px / 2, y - px / 2, px, px);
+  } else if (it.k === 'sp') {
+    const M = METALS[state.metal].c, h = Math.min(d * 0.82, 6.5), w = 2.6;
+    ctx.translate(x, y); ctx.rotate(o.a); ctx.scale(ppm, ppm);
+    ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 2;
+    const lg = ctx.createLinearGradient(0, -w / 2, 0, w / 2);
+    lg.addColorStop(0, M[2]); lg.addColorStop(0.35, M[0]); lg.addColorStop(0.7, M[1]); lg.addColorStop(1, M[2]);
+    ctx.fillStyle = lg; rrect(ctx, -h / 2, -w / 2, h, w, 0.9); ctx.fill();
+  } else {
+    const M = METALS[state.metal].c;
+    ctx.translate(x, y); ctx.rotate(o.a + Math.PI / 2); ctx.scale(ppm, ppm);
+    ctx.strokeStyle = M[1]; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, d / 2 + 2.2); ctx.stroke();
+    ctx.lineWidth = 0.55; ctx.beginPath(); ctx.arc(0, d / 2 + 3.2, 1.1, 0, 7); ctx.stroke();
+    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3;
+    ctx.drawImage(charmSprite(it.id, state.metal), -6, d / 2 + 4.2, 12, 12);
+  }
+  ctx.restore();
+}
+
+function drawBoard(canvas, S, opts = {}) {
+  const ctx = canvas.getContext('2d'), k = canvas.width / S;
+  ctx.setTransform(k, 0, 0, k, 0, 0);
+  const G = geometry(S);
+  const bg = ctx.createRadialGradient(S * 0.45, S * 0.4, S * 0.1, S / 2, S / 2, S * 0.75);
+  bg.addColorStop(0, '#2B3A35'); bg.addColorStop(1, '#16201C');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, S, S);
+  ctx.fillStyle = noisePattern(ctx); ctx.fillRect(0, 0, S, S);
+  const { cx, cy, R, ppm, tgt } = G;
+  // groove
+  const gw = Math.max(state.size * ppm + 10, 18);
+  ctx.strokeStyle = 'rgba(0,0,0,.28)'; ctx.lineWidth = gw; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(cx, cy, R + gw / 2, 0, Math.PI * 2); ctx.stroke();
+  // ruler
+  if (!opts.mini) {
+    const tr = R + gw / 2 + 8;
+    ctx.fillStyle = 'rgba(233,239,235,.5)'; ctx.font = `${Math.max(9, S * 0.019)}px "JetBrains Mono", monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let mm = 0; mm < tgt - 1; mm += 5) {
+      const a = -Math.PI / 2 + mm * ppm / R, long = mm % 10 === 0, len = long ? 9 : 5;
+      ctx.strokeStyle = long ? 'rgba(233,239,235,.45)' : 'rgba(233,239,235,.22)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * tr, cy + Math.sin(a) * tr); ctx.lineTo(cx + Math.cos(a) * (tr + len), cy + Math.sin(a) * (tr + len)); ctx.stroke();
+      if (mm % 20 === 0) { const lr = tr + len + S * 0.024; ctx.fillText(String(mm / 10), cx + Math.cos(a) * lr, cy + Math.sin(a) * lr); }
+    }
+  }
+  // cord
+  ctx.strokeStyle = 'rgba(236,230,218,.5)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  const pos = o => [cx + Math.cos(o.a) * R, cy + Math.sin(o.a) * R];
+  const dragging = !opts.mini && drag && drag.moved ? drag.i : -1;
+  G.lay.filter(o => o.it.k === 'ch').forEach(o => drawItem(ctx, G, o, ...pos(o), o.i === dragging ? 0.3 : 1));
+  G.lay.filter(o => o.it.k !== 'ch').forEach(o => drawItem(ctx, G, o, ...pos(o), o.i === dragging ? 0.3 : 1));
+  if (!opts.mini) {
+    // selection
+    const so = G.lay[state.sel];
+    if (so && dragging < 0) {
+      ctx.strokeStyle = '#E8CB8A'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      if (so.it.k === 'ch') { const an = charmAnchor(G, so); ctx.arc(an.x, an.y, an.r + 4, 0, 7); }
+      else { const [x, y] = pos(so); ctx.arc(x, y, Math.max(so.w, 5) / 2 * ppm + 4, 0, 7); }
+      ctx.stroke();
+    }
+    if (dragging >= 0) {
+      const o = G.lay[dragging];
+      const a = Math.atan2(drag.y - cy, drag.x - cx);
+      drawItem(ctx, G, { ...o, a }, drag.x, drag.y, 0.95);
+    }
+    // centre readout
+    const n = stoneCount();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    if (!state.items.length) {
+      ctx.fillStyle = 'rgba(233,239,235,.75)'; ctx.font = `${S * 0.05}px Forum, serif`;
+      ctx.fillText('Оберіть камінь,', cx, cy - S * 0.005);
+      ctx.fillText('щоб почати', cx, cy + S * 0.05);
+    } else {
+      ctx.fillStyle = '#E9EFEB'; ctx.font = `${S * 0.1}px Forum, serif`; ctx.fillText(String(n), cx, cy - S * 0.01);
+      ctx.fillStyle = 'rgba(233,239,235,.65)'; ctx.font = `500 ${S * 0.026}px Manrope, sans-serif`;
+      ctx.fillText(`${plural(n, 'бусина', 'бусини', 'бусин')} · ${state.size} мм`, cx, cy + S * 0.035);
+      ctx.font = `${S * 0.024}px "JetBrains Mono", monospace`;
+      ctx.fillText(`${cm(G.total)} / ${cm(tgt)} см`, cx, cy + S * 0.075);
+    }
+  }
+  return G;
+}
+function draw() { if (boardPx) geo = drawBoard(board, boardPx); }
+function sizeBoard() {
+  const w = boardWrap.clientWidth; if (!w) return;
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  board.width = board.height = Math.round(w * dpr); boardPx = w; draw();
+}
+new ResizeObserver(sizeBoard).observe(boardWrap);
+
+/* ---------- hit testing & drag ---------- */
+function hitAt(x, y) {
+  if (!geo) return -1;
+  const G = geo;
+  for (const o of G.lay) if (o.it.k === 'ch') { const an = charmAnchor(G, o); if (Math.hypot(x - an.x, y - an.y) <= an.r + 2) return o.i; }
+  const dist = Math.hypot(x - G.cx, y - G.cy), ang = Math.atan2(y - G.cy, x - G.cx);
+  let best = -1, bd = Infinity;
+  for (const o of G.lay) {
+    if (o.it.k === 'ch') continue;
+    const half = Math.max(o.w, 5) / 2 * G.ppm / G.R, diff = Math.abs(normA(ang - o.a));
+    if (diff <= half && Math.abs(dist - G.R) <= Math.max(state.size, 6) / 2 * G.ppm + 6 && diff < bd) { bd = diff; best = o.i; }
+  }
+  return best;
+}
+const local = e => { const r = board.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+board.addEventListener('pointerdown', e => {
+  const [x, y] = local(e), i = hitAt(x, y);
+  drag = { i, x0: x, y0: y, x, y, moved: false, mouse: e.pointerType !== 'touch' };
+  if (i >= 0 && drag.mouse) board.setPointerCapture(e.pointerId);
+});
+board.addEventListener('pointermove', e => {
+  if (!drag || drag.i < 0 || !drag.mouse) return;
+  const [x, y] = local(e); drag.x = x; drag.y = y;
+  if (!drag.moved && Math.hypot(x - drag.x0, y - drag.y0) > 6) drag.moved = true;
+  if (drag.moved) draw();
+});
+board.addEventListener('pointerup', e => {
+  if (!drag) return;
+  const d = drag; drag = null;
+  if (d.moved && d.i >= 0) {
+    const G = geo, ang = Math.atan2(d.y - G.cy, d.x - G.cx);
+    const rest = G.lay.filter(o => o.i !== d.i);
+    let to = rest.length;
+    if (rest.length) {
+      let j = 0, bd = Infinity;
+      rest.forEach((o, k) => { const df = Math.abs(normA(ang - o.a)); if (df < bd) { bd = df; j = k; } });
+      to = normA(ang - rest[j].a) > 0 ? j + 1 : j;
+    }
+    if (to !== d.i) commit(() => { const [it] = state.items.splice(d.i, 1); state.items.splice(to, 0, it); state.sel = to; });
+    else render();
+    return;
+  }
+  state.sel = d.i === state.sel ? -1 : d.i;
+  if (state.sel >= 0 && state.items[state.sel].k === 's') infoId = state.items[state.sel].id;
+  render();
+});
+board.addEventListener('pointercancel', () => { drag = null; draw(); });
+board.addEventListener('keydown', e => {
+  const n = state.items.length; if (!n) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const dir = e.key === 'ArrowRight' ? 1 : -1;
+    if (e.shiftKey && state.sel >= 0) return move(dir);
+    state.sel = state.sel < 0 ? (dir > 0 ? 0 : n - 1) : (state.sel + dir + n) % n;
+    if (state.items[state.sel].k === 's') infoId = state.items[state.sel].id;
+    render();
+  } else if ((e.key === 'Delete' || e.key === 'Backspace') && state.sel >= 0) { e.preventDefault(); removeSel(); }
+  else if (e.key === 'Escape') { state.sel = -1; render(); }
+});
+
+/* ---------- design operations ---------- */
+function snapshot() { return JSON.stringify({ items: state.items, size: state.size, wrist: state.wrist, fit: state.fit, metal: state.metal }); }
+function pushHistory(snap = snapshot()) { history.push(snap); if (history.length > 60) history.shift(); }
+function commit(fn) { pushHistory(); fn(); render(); }
+function undo() {
+  const s = history.pop(); if (!s) return;
+  Object.assign(state, JSON.parse(s)); state.sel = -1; render(); toast('Скасовано');
+}
+function isFull(items, size, tgt) { const len = items.reduce((a, it) => a + (it.k === 's' ? size : it.k === 'sp' ? SPACER_W : 0), 0); return items.length > 0 && tgt - len < size; }
+function fitPattern(pattern) {
+  const charms = pattern.map((it, i) => ({ it, i })).filter(o => o.it.k === 'ch');
+  const base = pattern.filter(it => it.k !== 'ch');
+  const out = [];
+  if (base.length) {
+    let len = 0;
+    for (let i = 0; i < 400; i++) {
+      const n = base[i % base.length], w = width(n);
+      if (len + w > target() + TOL) break;
+      out.push(i < base.length ? clone(n) : { ...n, v: n.k === 's' ? rv() : undefined });
+      len += w;
+    }
+  }
+  charms.forEach(o => out.splice(Math.round(o.i / Math.max(pattern.length, 1) * out.length), 0, clone(o.it)));
+  return out;
+}
+function trim(items) {
+  const out = items.map(clone);
+  while (lengthOf(out) > target() + TOL) { let j = out.length - 1; while (j >= 0 && out[j].k === 'ch') j--; if (j < 0) break; out.splice(j, 1); }
+  return out;
+}
+function refit(base, wasFull) { state.items = wasFull ? fitPattern(base) : trim(base); state.sel = -1; }
+const toItem = code => code === 'S' ? { k: 'sp' } : { k: 's', id: code, v: rv() };
+function applyPreset(p) {
+  state.items = fitPattern(p.pattern.map(toItem));
+  if (p.charm) state.items.splice(Math.round(state.items.length / 2), 0, { k: 'ch', id: p.charm });
+  state.sel = -1;
+}
+function insertPos() { return state.sel >= 0 ? state.sel + 1 : state.items.length; }
+function addStone(id) {
+  infoId = id;
+  const cur = state.items[state.sel];
+  if (cur && cur.k === 's') {
+    if (cur.id === id) { render(); return; }
+    commit(() => { state.items[state.sel] = { k: 's', id, v: rv() }; });
+    toast(`Замінено на «${STONE[id].name}»`);
+    return;
+  }
+  if (lengthOf(state.items) + state.size > target() + TOL) { toast('Браслет заповнений. Видаліть бусину або замініть вибрану.'); renderInfo(); return; }
+  commit(() => { const p = insertPos(); state.items.splice(p, 0, { k: 's', id, v: rv() }); if (state.sel >= 0) state.sel = p; });
+}
+function addSpacer() {
+  if (lengthOf(state.items) + SPACER_W > target() + TOL) { toast('Немає місця для розділювача. Спершу видаліть одну бусину.'); return; }
+  commit(() => { const p = insertPos(); state.items.splice(p, 0, { k: 'sp' }); state.sel = p; });
+}
+function addCharm(id) {
+  if (state.items.filter(i => i.k === 'ch').length >= MAX_CHARMS) { toast('Можна додати до 3 підвісок.'); return; }
+  commit(() => {
+    const p = state.sel >= 0 ? state.sel + 1 : Math.round(state.items.length / 2);
+    state.items.splice(p, 0, { k: 'ch', id }); state.sel = p;
+  });
+}
+function removeSel() {
+  if (state.sel < 0) return;
+  commit(() => { state.items.splice(state.sel, 1); state.sel = Math.min(state.sel, state.items.length - 1); });
+}
+function move(dir) {
+  const i = state.sel, j = i + dir;
+  if (i < 0 || j < 0 || j >= state.items.length) return;
+  commit(() => { [state.items[i], state.items[j]] = [state.items[j], state.items[i]]; state.sel = j; });
+}
+
+/* ---------- UI build ---------- */
+function swatch(id, px, v = 0) {
+  const c = el('canvas'); const d = Math.min(window.devicePixelRatio || 1, 2);
+  c.width = c.height = Math.round(px * d);
+  const g = c.getContext('2d'); g.drawImage(stoneSprite(id, v), 0, 0, c.width, c.height);
+  c.setAttribute('aria-hidden', 'true');
+  return c;
+}
+function segButtons(host, opts, get, set) {
+  host.replaceChildren(...opts.map(o => {
+    const b = el('button', { type: 'button' });
+    b.innerHTML = o.sub ? `${o.label}<small>${o.sub}</small>` : o.label;
+    b.dataset.v = o.v; b.addEventListener('click', () => set(o.v));
+    return b;
+  }));
+  host._sync = () => host.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v == get())));
+}
+segButtons($('#fitseg'), FITS, () => state.fit, v => {
+  if (v === state.fit) return;
+  const wasFull = isFull(state.items, state.size, target());
+  commit(() => { const base = state.items; state.fit = v; refit(base, wasFull); });
+});
+segButtons($('#sizeseg'), [6, 8, 10].map(v => ({ v, label: `${v} мм` })), () => state.size, v => {
+  if (v === state.size) return;
+  const wasFull = isFull(state.items, state.size, target());
+  commit(() => { const base = state.items; state.size = v; refit(base, wasFull); });
+  if (wasFull) toast('Візерунок підлаштовано під новий розмір бусин');
+});
+segButtons($('#metalseg'), Object.entries(METALS).map(([v, m]) => ({ v, label: m.name })), () => state.metal, v => {
+  if (v === state.metal) return; commit(() => { state.metal = v; }); buildAddons();
+});
+
+let wristBase = null;
+$('#wrist').addEventListener('input', e => {
+  if (!wristBase) wristBase = { snap: snapshot(), items: state.items, wasFull: isFull(state.items, state.size, target()) };
+  state.wrist = +e.target.value; refit(wristBase.items, wristBase.wasFull); render();
+});
+$('#wrist').addEventListener('change', () => { if (wristBase) { pushHistory(wristBase.snap); wristBase = null; render(); } });
+
+$('#filters').replaceChildren(...Object.entries(INTENTS).map(([k, label]) => {
+  const b = el('button', { type: 'button', textContent: label }); b.dataset.k = k;
+  b.addEventListener('click', () => { filter = k; renderPalette(); });
+  return b;
+}));
+const palette = $('#palette');
+palette.replaceChildren(...STONES.map(s => {
+  const b = el('button', { type: 'button', className: 'stone' }, [swatch(s.id, 34), el('span', {}, [el('b', { textContent: s.name }), el('small')])]);
+  b.dataset.id = s.id;
+  b.addEventListener('click', () => addStone(s.id));
+  b.addEventListener('mouseenter', () => { infoId = s.id; renderInfo(); });
+  b.addEventListener('focus', () => { infoId = s.id; renderInfo(); });
+  return b;
+}));
+function buildAddons() {
+  const M = METALS[state.metal];
+  const sp = el('canvas'); sp.width = sp.height = 52;
+  { const g = sp.getContext('2d'), lg = g.createLinearGradient(18, 0, 34, 0); lg.addColorStop(0, M.c[2]); lg.addColorStop(0.35, M.c[0]); lg.addColorStop(0.7, M.c[1]); lg.addColorStop(1, M.c[2]); g.fillStyle = lg; rrect(g, 19, 6, 14, 40, 5); g.fill(); }
+  const spBtn = el('button', { type: 'button', className: 'addon' }, [sp, 'Розділювач', el('small', { textContent: uah(M.spacer) })]);
+  spBtn.addEventListener('click', addSpacer);
+  const charmBtns = CHARMS.map(c => {
+    const cv = el('canvas'); cv.width = cv.height = 52; cv.getContext('2d').drawImage(charmSprite(c.id, state.metal), 0, 0, 52, 52);
+    const b = el('button', { type: 'button', className: 'addon' }, [cv, c.name, el('small', { textContent: uah(M.charm) })]);
+    b.addEventListener('click', () => addCharm(c.id));
+    return b;
+  });
+  $('#addons').replaceChildren(spBtn, ...charmBtns);
+}
+$('#presets').replaceChildren(...PRESETS.map(p => {
+  const cv = el('canvas'); cv.width = 92; cv.height = 36;
+  const g = cv.getContext('2d'); const ids = p.pattern.filter(x => x !== 'S').slice(0, 3);
+  ids.forEach((id, i) => g.drawImage(stoneSprite(id, i), 4 + i * 28, 2, 32, 32));
+  const b = el('button', { type: 'button', className: 'preset' }, [cv, p.name]);
+  b.addEventListener('click', () => { commit(() => applyPreset(p)); toast(`Візерунок «${p.name}»`); });
+  return b;
+}));
+$('#t-left').addEventListener('click', () => move(-1));
+$('#t-right').addEventListener('click', () => move(1));
+$('#t-del').addEventListener('click', removeSel);
+$('#t-undo').addEventListener('click', undo);
+$('#t-clear').addEventListener('click', () => { if (!state.items.length) return; commit(() => { state.items = []; state.sel = -1; }); toast('Браслет очищено', true); });
+$('#a-repeat').addEventListener('click', () => {
+  if (!state.items.some(i => i.k !== 'ch')) { toast('Спершу додайте кілька каменів'); return; }
+  commit(() => { state.items = fitPattern(state.items); state.sel = -1; });
+});
+$('#a-shuffle').addEventListener('click', () => {
+  const idx = state.items.map((it, i) => it.k === 's' ? i : -1).filter(i => i >= 0);
+  if (idx.length < 2) return;
+  commit(() => {
+    const st = idx.map(i => state.items[i]);
+    for (let i = st.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [st[i], st[j]] = [st[j], st[i]]; }
+    idx.forEach((i, k) => { state.items[i] = st[k]; });
+  });
+});
+$('#gift').addEventListener('change', e => { state.gift = e.target.checked; render(); });
+
+/* ---------- render ---------- */
+function renderPalette() {
+  $('#filters').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === filter)));
+  palette.querySelectorAll('.stone').forEach(b => {
+    const s = STONE[b.dataset.id];
+    b.hidden = filter !== 'all' && !s.intents.includes(filter);
+    b.querySelector('small').textContent = `${beadPrice(s.id)} грн / шт`;
+  });
+}
+function renderInfo() {
+  const s = STONE[infoId];
+  const info = $('#info');
+  info.replaceChildren(
+    swatch(s.id, 56, 1),
+    el('div', {}, [
+      el('h3', { textContent: s.name }),
+      el('p', { textContent: s.meaning }),
+      (() => {
+        const dl = el('dl');
+        [['Твердість', s.mohs + ' за Моосом'], ['Походження', s.origin], [`${state.size} мм`, `${beadPrice(s.id)} грн`]].forEach(([t, d]) => dl.append(el('div', {}, [el('dt', { textContent: t }), el('dd', { textContent: d })])));
+        return dl;
+      })(),
+    ]),
+  );
+}
+function priceLines() {
+  const M = METALS[state.metal], lines = [], stones = new Map();
+  let sp = 0; const charms = new Map();
+  state.items.forEach(it => {
+    if (it.k === 's') stones.set(it.id, (stones.get(it.id) || 0) + 1);
+    else if (it.k === 'sp') sp++;
+    else charms.set(it.id, (charms.get(it.id) || 0) + 1);
+  });
+  stones.forEach((n, id) => lines.push([`${STONE[id].name}, ${state.size} мм × ${n}`, beadPrice(id) * n]));
+  if (sp) lines.push([`Розділювач, ${M.short} × ${sp}`, M.spacer * sp]);
+  charms.forEach((n, id) => lines.push([`Підвіска «${CHARM[id].name}», ${M.short}${n > 1 ? ' × ' + n : ''}`, M.charm * n]));
+  if (state.items.length) lines.push(['Еластична нитка і збирання', BASE]);
+  if (state.gift) lines.push(['Подарункова коробка', GIFT]);
+  return lines;
+}
+function fillLines(host, lines) {
+  host.replaceChildren(...(lines.length ? lines.map(([a, b]) => el('div', {}, [el('span', { textContent: a }), el('span', { textContent: uah(b) })])) : [el('div', {}, [el('span', { textContent: 'Браслет поки порожній' }), el('span')])]));
+}
+function render() {
+  const tgt = target(), total = lengthOf(state.items), n = stoneCount();
+  $('#wrist').value = state.wrist;
+  $('#wristout').textContent = `${cm(state.wrist)} см`;
+  ['#fitseg', '#sizeseg', '#metalseg'].forEach(s => $(s)._sync());
+  $('#gift').checked = state.gift;
+  // status
+  const st = $('#status'), rem = tgt - total;
+  if (!state.items.length) { st.className = 'chip idle'; st.textContent = 'Порожній браслет'; }
+  else if (total > tgt + 0.01) { st.className = 'chip warn'; st.textContent = `Довший на ${Math.round(total - tgt)} мм`; }
+  else if (rem < state.size) { st.className = 'chip ok'; st.textContent = 'Браслет заповнено'; }
+  else { const k = Math.floor(rem / state.size); st.className = 'chip idle'; st.textContent = `Місце ще для ${k} ${plural(k, 'бусини', 'бусин', 'бусин')}`; }
+  $('#lenline').textContent = `${cm(total)} з ${cm(tgt)} см`;
+  // selection
+  const cur = state.items[state.sel];
+  const si = $('#selinfo');
+  if (!cur) si.textContent = 'Натисніть бусину на дошці, щоб вибрати її. Мишею бусини можна перетягувати.';
+  else if (cur.k === 's') si.innerHTML = `Вибрано: <b>${STONE[cur.id].name}</b>, ${state.size} мм, ${beadPrice(cur.id)} грн. Натисніть інший камінь, щоб замінити.`;
+  else if (cur.k === 'sp') si.innerHTML = `Вибрано: <b>розділювач</b>, ${METALS[state.metal].short}.`;
+  else si.innerHTML = `Вибрано: <b>підвіска «${CHARM[cur.id].name}»</b>, ${METALS[state.metal].short}.`;
+  $('#t-left').disabled = !cur || state.sel === 0;
+  $('#t-right').disabled = !cur || state.sel === state.items.length - 1;
+  $('#t-del').disabled = !cur;
+  $('#t-undo').disabled = !history.length;
+  $('#mode').innerHTML = cur && cur.k === 's' ? '<b>Заміна вибраної бусини</b>' : cur ? 'Камінь додасться після вибраного' : 'Камінь додається в кінець';
+  // price
+  const lines = priceLines(), sum = lines.reduce((a, l) => a + l[1], 0);
+  fillLines($('#lines'), lines);
+  $('#total').textContent = uah(sum);
+  $('#mtotal').textContent = uah(sum);
+  $('#msub').textContent = `${n} ${plural(n, 'бусина', 'бусини', 'бусин')} · ${cm(total)} см`;
+  renderPalette(); renderInfo(); draw(); renderRecap(lines);
+  try { localStorage.setItem(KEY, JSON.stringify({ wrist: state.wrist, fit: state.fit, size: state.size, metal: state.metal, gift: state.gift, items: state.items })); } catch (e) {}
+}
+
+/* ---------- order ---------- */
+const recapcv = $('#recapcv');
+function renderRecap(lines) {
+  const w = recapcv.clientWidth || 300, d = Math.min(window.devicePixelRatio || 1, 2);
+  recapcv.width = recapcv.height = Math.round(w * d);
+  drawBoard(recapcv, w, { mini: true });
+  fillLines($('#recaplines'), lines);
+}
+function orderText(sum) {
+  const v = id => $(id).value.trim();
+  const fit = FITS.find(f => f.v === state.fit);
+  const seq = state.items.map(it => it.k === 's' ? STONE[it.id].name : it.k === 'sp' ? 'розділювач' : `підвіска «${CHARM[it.id].name}»`).join(' → ');
+  return [
+    'Замовлення браслета «Друза»',
+    '',
+    `Обхват зап’ястка: ${cm(state.wrist)} см, посадка: ${fit.label.toLowerCase()} (${fit.sub})`,
+    `Довжина: ${cm(lengthOf(state.items))} см, бусини ${state.size} мм, метал: ${METALS[state.metal].name}`,
+    '',
+    'Послідовність від застібки за годинниковою стрілкою:',
+    seq,
+    '',
+    'Склад:',
+    ...priceLines().map(([a, b]) => `· ${a}: ${uah(b)}`),
+    `Разом: ${uah(sum)}`,
+    '',
+    `Ім’я: ${v('#f-name')}`,
+    `Телефон: ${v('#f-phone')}`,
+    `Доставка: ${$('#f-ship').value}, ${v('#f-city') || 'не вказано'}`,
+    v('#f-note') ? `Коментар: ${v('#f-note')}` : '',
+  ].filter((l, i, a) => !(l === '' && a[i - 1] === '')).join('\n').trim();
+}
+$('#form').addEventListener('submit', e => {
+  e.preventDefault();
+  const err = $('#f-err');
+  if (!stoneCount()) { err.textContent = 'Додайте в браслет хоча б один камінь.'; return; }
+  if (!$('#f-name').value.trim()) { err.textContent = 'Вкажіть імʼя.'; $('#f-name').focus(); return; }
+  if ($('#f-phone').value.replace(/\D/g, '').length < 10) { err.textContent = 'Вкажіть телефон у форматі +380 XX XXX XX XX.'; $('#f-phone').focus(); return; }
+  err.textContent = '';
+  const sum = priceLines().reduce((a, l) => a + l[1], 0);
+  $('#ordertext').value = orderText(sum);
+  $('#result').hidden = false;
+  $('#result').scrollIntoView({ block: 'nearest' });
+});
+$('#copy').addEventListener('click', () => {
+  const ta = $('#ordertext');
+  const fallback = () => { ta.focus(); ta.select(); toast('Текст виділено. Натисніть Ctrl+C, щоб скопіювати.'); };
+  try { navigator.clipboard.writeText(ta.value).then(() => toast('Текст замовлення скопійовано'), fallback); } catch (e) { fallback(); }
+});
+
+/* ---------- catalogue & size table ---------- */
+$('#catalog').replaceChildren(...STONES.map(s => {
+  const dl = el('dl');
+  [['Твердість', s.mohs + ' за Моосом'], ['Походження', s.origin], ['Бусина 8 мм', `${s.price} грн`]].forEach(([t, d]) => dl.append(el('dt', { textContent: t }), el('dd', { textContent: d })));
+  const add = el('button', { type: 'button', className: 'add', textContent: 'Додати в браслет' });
+  add.addEventListener('click', () => { state.sel = -1; addStone(s.id); toast(`${s.name}: додано в браслет`); });
+  return el('article', { className: 'card' }, [
+    el('div', { className: 'head' }, [swatch(s.id, 64, 2), el('div', {}, [el('h3', { textContent: s.name }), el('div', { className: 'tags' }, s.intents.map(k => el('span', { textContent: INTENTS[k] })))])]),
+    el('p', { textContent: s.meaning }), dl, add,
+  ]);
+}));
+(() => {
+  const t = $('#sizetable');
+  t.innerHTML = `<thead><tr><th>Зап’ясток</th>${FITS.map(f => `<th>${f.label}</th>`).join('')}<th>Бусин 8 мм</th></tr></thead>`;
+  const tb = el('tbody');
+  for (let w = 140; w <= 200; w += 10) {
+    tb.insertAdjacentHTML('beforeend', `<tr><td>${cm(w)} см</td>${FITS.map(f => `<td>${cm(w + f.v)} см</td>`).join('')}<td>${Math.floor((w + 15 + TOL) / 8)}</td></tr>`);
+  }
+  t.append(tb);
+})();
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg, withUndo = false) {
+  const t = $('#toast'); $('#toastmsg').textContent = msg; $('#toastundo').hidden = !withUndo;
+  t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), withUndo ? 5000 : 2400);
+}
+$('#toastundo').addEventListener('click', () => { undo(); $('#toast').classList.remove('on'); });
+
+/* ---------- boot ---------- */
+let loaded = false;
+try {
+  const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (s && Array.isArray(s.items) && SIZES[s.size] && METALS[s.metal] && FITS.some(f => f.v === s.fit)) {
+    const items = s.items.filter(it => (it.k === 's' && STONE[it.id]) || it.k === 'sp' || (it.k === 'ch' && CHARM[it.id]));
+    Object.assign(state, { wrist: Math.min(210, Math.max(130, +s.wrist || 160)), fit: s.fit, size: s.size, metal: s.metal, gift: !!s.gift, items });
+    loaded = items.length > 0;
+  }
+} catch (e) {}
+if (!loaded) applyPreset(PRESETS[0]);
+buildAddons();
+render();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+})();
+</script>
