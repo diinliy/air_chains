@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Замовлення Air Chains</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap">
+<script>try { document.documentElement.setAttribute('data-theme', localStorage.getItem('ac-theme') || 'light'); } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }</script>
+<style>
+/* Layout: a working list for the owner, newest orders first, one card per order. */
+:root {
+  --bg: #F6F6F3; --surface: #FFFFFF; --ink: #1B1F1D; --muted: #5E6662; --line: #E0E3DF;
+  --accent: #7A5B22; --accent-ink: #FFFFFF; --accent-soft: #EFE7D6; --warn: #A4521A;
+  --st-new: #9A5B14; --st-new-bg: #F7E9D2; --st-work: #2F5FA8; --st-work-bg: #E1EAF7; --st-sent: #6A4AA0; --st-sent-bg: #ECE4F6;
+  --st-done: #2E7A4D; --st-done-bg: #DFF0E5; --st-cancel: #6B6F6D; --st-cancel-bg: #ECEDEC;
+  --display: "Forum", "Times New Roman", serif; --body: "Manrope", "Segoe UI", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #111614; --surface: #18201D; --ink: #E5EBE7; --muted: #95A29C; --line: #2A3430;
+  --accent: #D3AF6B; --accent-ink: #1A1408; --accent-soft: #3A3223; --warn: #E59B60;
+  --st-new: #F2C27E; --st-new-bg: #3A2E1A; --st-work: #9CC0F2; --st-work-bg: #1E2C40; --st-sent: #C9B2EE; --st-sent-bg: #2D2440;
+  --st-done: #8FD4A8; --st-done-bg: #1D3326; --st-cancel: #A9AFAC; --st-cancel-bg: #262B29;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 40px); }
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; }
+.logo { font: 400 24px/1 var(--display); white-space: nowrap; color: var(--ink); text-decoration: none; }
+.logo small { font: 600 11px var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-left: 8px; }
+.actions { display: flex; gap: 8px; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; }
+.btn:hover { border-color: var(--ink); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.danger { color: var(--warn); }
+.btn svg { width: 16px; height: 16px; }
+.icon { width: 38px; height: 38px; padding: 0; justify-content: center; border-radius: 50%; }
+main { padding-block: 24px 60px; display: grid; gap: 18px; }
+h1 { font: 400 clamp(30px, 5vw, 42px)/1.05 var(--display); margin: 0; }
+.muted { color: var(--muted); font-size: 13.5px; }
+.login { max-width: 380px; margin: 8vh auto 0; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 24px; display: grid; gap: 14px; }
+.login input { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 11px 12px; }
+.err { color: var(--warn); font-size: 13.5px; min-height: 20px; margin: 0; }
+.bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.filters button { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer; color: var(--muted); }
+.filters button[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); background: var(--surface); }
+.filters b { font-family: var(--mono); font-weight: 500; margin-left: 4px; }
+.list { display: grid; gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 14px; align-items: start; }
+.thumb { width: 96px; height: 96px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); object-fit: cover; display: block; }
+.body { display: grid; gap: 6px; min-width: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.name { font-weight: 700; font-size: 16px; }
+.when { font-size: 12.5px; color: var(--muted); font-family: var(--mono); }
+.total { font: 400 22px/1 var(--display); }
+.phone { font-family: var(--mono); font-size: 14px; color: var(--ink); }
+.pill { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px; }
+.st-new { color: var(--st-new); background: var(--st-new-bg); } .st-work { color: var(--st-work); background: var(--st-work-bg); }
+.st-sent { color: var(--st-sent); background: var(--st-sent-bg); } .st-done { color: var(--st-done); background: var(--st-done-bg); }
+.st-cancel { color: var(--st-cancel); background: var(--st-cancel-bg); }
+select.status { border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 6px 8px; font-size: 13px; }
+.details { grid-column: 1 / -1; display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
+.details img { width: 100%; max-width: 420px; border-radius: 12px; border: 1px solid var(--line); }
+.details pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 13px/1.55 var(--mono); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13.5px; }
+.empty { text-align: center; padding: 48px 16px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 16px; }
+.empty b { display: block; font: 400 24px var(--display); color: var(--ink); margin-bottom: 4px; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: calc(100% - 32px); }
+.toast.on { opacity: 1; }
+@media (max-width: 520px) {
+  .card { grid-template-columns: 72px minmax(0, 1fr); }
+  .thumb { width: 72px; height: 72px; }
+  .logo small { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="../">Air Chains<small>замовлення</small></a>
+    <div class="actions">
+      <button class="btn icon" id="refresh" type="button" aria-label="Оновити" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
+      <button class="btn icon" id="theme" type="button" aria-label="Темна тема"></button>
+      <button class="btn" id="logout" type="button" hidden>Вийти</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <form class="login" id="login" hidden>
+    <h1>Вхід</h1>
+    <p class="muted">Пароль, який ви вказали в Cloudflare у полі ADMIN_KEY.</p>
+    <label for="key" class="muted" style="font-weight:600;color:var(--ink)">Пароль</label>
+    <input id="key" type="password" autocomplete="current-password" required>
+    <p class="err" id="login-err" role="alert"></p>
+    <button class="btn primary" type="submit" style="justify-content:center;padding:12px">Увійти</button>
+  </form>
+
+  <section id="app" hidden>
+    <div class="bar">
+      <div>
+        <h1>Замовлення</h1>
+        <p class="muted" id="sub">Нові замовлення з’являються тут протягом хвилини.</p>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="Фільтр за статусом"></div>
+    </div>
+    <p class="err" id="app-err" role="alert"></p>
+    <div class="list" id="list"></div>
+    <button class="btn" id="more" type="button" hidden style="justify-self:center">Показати ще</button>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+const API = 'https://air-chains-orders.diinliy.workers.dev';
+const STATUS = { new: 'Новий', work: 'В роботі', sent: 'Відправлено', done: 'Виконано', cancel: 'Скасовано' };
+const $ = s => document.querySelector(s);
+const el = (tag, props = {}, kids = []) => { const n = document.createElement(tag); Object.assign(n, props); kids.forEach(k => k != null && n.append(k)); return n; };
+let key = ''; try { key = localStorage.getItem('ac-admin') || ''; } catch (e) {}
+let orders = [], cursor = null, filter = 'all', open = null, confirmDel = null;
+const images = new Map();
+
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2200); }
+
+async function api(path, opts = {}) {
+  const r = await fetch(API + path, { ...opts, headers: { ...(opts.headers || {}), Authorization: 'Bearer ' + encodeURIComponent(key) } });
+  if (r.status === 401) { const e = new Error('unauthorized'); e.code = 401; throw e; }
+  return r;
+}
+async function apiJson(path, opts) {
+  const r = await api(path, opts);
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || !d.ok) { const e = new Error(d.error || ('http ' + r.status)); e.code = d.error; throw e; }
+  return d;
+}
+
+/* ---------- theme ---------- */
+const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
+const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>';
+function syncTheme() { const d = document.documentElement.dataset.theme === 'dark'; $('#theme').innerHTML = d ? SUN : MOON; $('#theme').setAttribute('aria-label', d ? 'Світла тема' : 'Темна тема'); }
+$('#theme').addEventListener('click', () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.setItem('ac-theme', t); } catch (e) {} syncTheme(); });
+syncTheme();
+
+/* ---------- login ---------- */
+function showLogin(msg) {
+  $('#app').hidden = true; $('#refresh').hidden = true; $('#logout').hidden = true;
+  $('#login').hidden = false; $('#login-err').textContent = msg || ''; $('#key').focus();
+}
+$('#login').addEventListener('submit', async e => {
+  e.preventDefault();
+  key = $('#key').value.trim();
+  $('#login-err').textContent = 'Перевіряємо…';
+  try { await load(true); try { localStorage.setItem('ac-admin', key); } catch (err) {} $('#key').value = ''; }
+  catch (err) { showLogin(err.code === 401 ? 'Неправильний пароль.' : 'Не вдалося з’єднатися із сервером. Спробуйте ще раз.'); }
+});
+$('#logout').addEventListener('click', () => { key = ''; try { localStorage.removeItem('ac-admin'); } catch (e) {} orders = []; images.forEach(u => URL.revokeObjectURL(u)); images.clear(); showLogin(); });
+
+/* ---------- data ---------- */
+async function load(reset) {
+  const d = await apiJson('/orders' + (!reset && cursor ? '?cursor=' + encodeURIComponent(cursor) : ''));
+  orders = reset ? d.orders : orders.concat(d.orders);
+  cursor = d.cursor;
+  $('#login').hidden = true; $('#app').hidden = false; $('#refresh').hidden = false; $('#logout').hidden = false;
+  $('#app-err').textContent = '';
+  render();
+}
+async function refresh(quiet) {
+  try { await load(true); if (!quiet) toast('Оновлено'); }
+  catch (e) { if (e.code === 401) showLogin('Пароль змінився. Увійдіть знову.'); else $('#app-err').textContent = e.code === 'no_storage' ? 'Сховище замовлень не підключене до воркера (binding ORDERS).' : 'Не вдалося завантажити замовлення. Перевірте інтернет і натисніть «Оновити».'; }
+}
+$('#refresh').addEventListener('click', () => refresh(false));
+$('#more').addEventListener('click', () => load(false).catch(() => toast('Не вдалося завантажити')));
+setInterval(() => { if (key && !document.hidden && !$('#app').hidden && !open) refresh(true); }, 60000);
+
+async function image(id) {
+  if (images.has(id)) return images.get(id);
+  const r = await api('/orders/' + id + '/image');
+  if (!r.ok) throw new Error('no image');
+  const url = URL.createObjectURL(await r.blob());
+  images.set(id, url);
+  return url;
+}
+async function setStatus(o, st) {
+  const prev = o.st; o.st = st; render();
+  try { await apiJson('/orders/' + o.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: st }) }); toast('Статус: ' + STATUS[st]); }
+  catch (e) { o.st = prev; render(); toast('Не вдалося змінити статус'); }
+}
+async function remove(o) {
+  try { await apiJson('/orders/' + o.id, { method: 'DELETE' }); orders = orders.filter(x => x !== o); open = null; confirmDel = null; render(); toast('Замовлення видалено'); }
+  catch (e) { toast('Не вдалося видалити'); }
+}
+
+/* ---------- render ---------- */
+const fmtDate = iso => { const d = new Date(iso); return d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }); };
+function render() {
+  const counts = { all: orders.length }; Object.keys(STATUS).forEach(k => { counts[k] = orders.filter(o => (o.st || 'new') === k).length; });
+  $('#filters').replaceChildren(...[['all', 'Усі'], ...Object.entries(STATUS)].map(([k, label]) => {
+    const b = el('button', { type: 'button' }, [label, el('b', { textContent: counts[k] })]);
+    b.setAttribute('aria-pressed', String(filter === k));
+    b.addEventListener('click', () => { filter = k; render(); });
+    return b;
+  }));
+  const shown = orders.filter(o => filter === 'all' || (o.st || 'new') === filter);
+  $('#sub').textContent = orders.length ? `Показано ${shown.length} з ${orders.length}${cursor ? '+' : ''}. Нові замовлення з’являються тут протягом хвилини.` : 'Нові замовлення з’являються тут протягом хвилини.';
+  if (!shown.length) {
+    $('#list').replaceChildren(el('div', { className: 'empty' }, [el('b', { textContent: orders.length ? 'Немає замовлень з таким статусом' : 'Замовлень поки немає' }), orders.length ? 'Оберіть інший фільтр.' : 'Щойно хтось оформить замовлення на сайті, воно з’явиться тут і в Telegram.']));
+  } else {
+    $('#list').replaceChildren(...shown.map(card));
+  }
+  $('#more').hidden = !cursor;
+}
+function card(o) {
+  const st = o.st || 'new';
+  const thumb = el('img', { className: 'thumb', alt: 'Браслет', loading: 'lazy' });
+  if (o.img) image(o.id).then(u => { thumb.src = u; }).catch(() => {});
+  const sel = el('select', { className: 'status', ariaLabel: 'Статус замовлення' }, Object.entries(STATUS).map(([k, l]) => el('option', { value: k, textContent: l, selected: k === st })));
+  sel.addEventListener('change', () => setStatus(o, sel.value));
+  const toggle = el('button', { className: 'btn', type: 'button', textContent: open === o.id ? 'Згорнути' : 'Деталі' });
+  toggle.addEventListener('click', () => { open = open === o.id ? null : o.id; confirmDel = null; render(); });
+  const c = el('article', { className: 'card' }, [
+    thumb,
+    el('div', { className: 'body' }, [
+      el('div', { className: 'row' }, [el('span', { className: 'name', textContent: o.n || 'Без імені' }), el('span', { className: 'pill st-' + st, textContent: STATUS[st] })]),
+      el('div', { className: 'row' }, [el('span', { className: 'total', textContent: o.s || '—' }), o.b ? el('span', { className: 'muted', textContent: o.b }) : null, el('span', { className: 'when', textContent: fmtDate(o.t) })]),
+      el('div', { className: 'row' }, [o.p ? el('a', { className: 'phone', href: 'tel:' + o.p.replace(/[^+\d]/g, ''), textContent: o.p }) : null]),
+      el('div', { className: 'row' }, [sel, toggle]),
+    ]),
+  ]);
+  if (open === o.id) c.append(details(o));
+  return c;
+}
+function details(o) {
+  const box = el('div', { className: 'details' }, [el('p', { className: 'muted', textContent: 'Завантажуємо…' })]);
+  apiJson('/orders/' + o.id).then(({ order }) => {
+    const pre = el('pre', { textContent: order.text });
+    const copy = el('button', { className: 'btn', type: 'button', textContent: 'Скопіювати текст' });
+    copy.addEventListener('click', () => navigator.clipboard.writeText(order.text).then(() => toast('Скопійовано'), () => toast('Не вдалося скопіювати')));
+    const del = el('button', { className: 'btn danger', type: 'button', textContent: 'Видалити' });
+    del.addEventListener('click', () => { confirmDel = o.id; render(); });
+    const actions = confirmDel === o.id
+      ? el('div', { className: 'confirm' }, ['Видалити це замовлення назавжди?', (() => { const y = el('button', { className: 'btn danger', type: 'button', textContent: 'Так, видалити' }); y.addEventListener('click', () => remove(o)); return y; })(), (() => { const n = el('button', { className: 'btn', type: 'button', textContent: 'Ні' }); n.addEventListener('click', () => { confirmDel = null; render(); }); return n; })()])
+      : el('div', { className: 'row' }, [copy, del]);
+    const kids = [];
+    if (order.contact) kids.push(el('p', { className: 'muted', textContent: 'Зв’язок: ' + order.contact }));
+    if (order.hasImage) { const big = el('img', { alt: 'Браслет із замовлення' }); image(o.id).then(u => { big.src = u; }).catch(() => {}); kids.push(big); }
+    box.replaceChildren(...kids, pre, actions);
+  }).catch(() => box.replaceChildren(el('p', { className: 'err', textContent: 'Не вдалося відкрити замовлення.' })));
+  return box;
+}
+
+if (key) refresh(true).then(() => { if ($('#app').hidden) showLogin(); }); else showLogin();
+})();
+</script>
+</body>
+</html>

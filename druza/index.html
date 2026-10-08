@@ -1350,7 +1350,7 @@ $('#form').addEventListener('submit', e => {
   };
   if (!ORDER_ENDPOINT) { show('Замовлення сформовано'); return; }
   const btn = $('#f-submit'); btn.disabled = true; btn.textContent = 'Надсилаємо…';
-  fetch(ORDER_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, image: braceletPhoto(), summary: `${$('#f-name').value.trim()}, ${$('#f-phone').value.trim()} · ${uah(sum)}`, website: $('#f-website').value }) })
+  fetch(ORDER_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, image: braceletPhoto(), summary: `${$('#f-name').value.trim()}, ${$('#f-phone').value.trim()} · ${uah(sum)}`, meta: { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), contact: $('#f-contact').value.trim(), total: uah(sum), beads: `${stoneCount()} ${plural(stoneCount(), 'бусина', 'бусини', 'бусин')}, ${sizesLabel()}` }, website: $('#f-website').value }) })
     .then(r => r.json().catch(() => ({})).then(d => { if (!r.ok || !d.ok) throw new Error(d.error || r.status); }))
     .then(() => { show('Замовлення надіслано', 'Дякуємо! Замовлення вже у нас. Майстер зв’яжеться з вами найближчим часом і надішле фото підібраних каменів.'); toast('Замовлення надіслано'); })
     .catch(() => { err.textContent = 'Не вдалося надіслати автоматично. Скопіюйте текст нижче і надішліть нам у Direct.'; show('Замовлення сформовано'); })
