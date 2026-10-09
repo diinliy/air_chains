@@ -285,8 +285,10 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .ptext ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
 .ptext a, .faq a, .note a { color: var(--accent); }
 @media (max-width: 760px) { .policy { grid-template-columns: 1fr; } }
-.flinks { display: flex; flex-wrap: wrap; gap: 6px 16px; }
-.flinks a { color: inherit; }
+.flinks { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.flinks a { color: var(--ink); text-decoration: none; font-size: 16px; padding: 8px 12px; }
+.flinks a:hover { color: var(--accent); }
+.fbrand { font-size: 12.5px; }
 .sec > header { display: flex; justify-content: space-between; align-items: end; gap: 12px 24px; flex-wrap: wrap; margin-bottom: 28px; }
 .sec h2 { font-size: clamp(32px, 4.4vw, 48px); }
 .sec > header p { color: var(--muted); max-width: 52ch; }
@@ -361,8 +363,8 @@ tbody tr:last-child td { border-bottom: 0; }
 .faq details[open] summary::after { content: "−"; }
 .faq p { color: var(--muted); margin-top: 8px; max-width: 65ch; }
 
-footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: 13px; }
-footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+footer { border-top: 1px solid var(--line); padding-block: 32px 44px; color: var(--muted); font-size: 13px; }
+footer .wrap { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; }
 
 .mbar { display: none; }
 .tabbar { display: none; }
@@ -725,7 +727,18 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 </main>
 
 <footer>
-  <div class="wrap"><span>Air Chains · браслети з натурального каміння</span><span class="flinks"><a href="#constructor">Конструктор</a><a href="#bracelets">Готові браслети</a><a href="#stones">Камені</a><a href="#buyers">Покупцям</a><a href="#info">Допомога</a></span><a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" style="color:inherit">Instagram</a></div>
+  <div class="wrap">
+    <nav class="flinks" aria-label="Розділи сайту">
+      <a href="#constructor">Конструктор</a>
+      <a href="#bracelets">Готові браслети</a>
+      <a href="#stones">Камені</a>
+      <a href="#buyers">Покупцям</a>
+      <a href="#info">Допомога</a>
+      <a href="#cart">Кошик</a>
+      <a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener">Instagram</a>
+    </nav>
+    <span class="fbrand">Air Chains · браслети з натурального каміння</span>
+  </div>
 </footer>
 
 <nav class="tabbar" id="tabbar" role="tablist" aria-label="Кроки конструктора">
