@@ -106,7 +106,7 @@ body.menu-open .nav { visibility: visible; pointer-events: auto; clip-path: inse
 body.menu-open .nav > * { opacity: 1; transform: none; transition: opacity .4s ease, transform .45s cubic-bezier(.22, .8, .24, 1); }
 body.menu-open .nav > :nth-child(1) { transition-delay: .05s; } body.menu-open .nav > :nth-child(2) { transition-delay: .09s; }
 body.menu-open .nav > :nth-child(3) { transition-delay: .13s; } body.menu-open .nav > :nth-child(4) { transition-delay: .17s; }
-body.menu-open .nav > :nth-child(5) { transition-delay: .21s; } body.menu-open .nav > :nth-child(6) { transition-delay: .25s; } body.menu-open .nav > :nth-child(7) { transition-delay: .29s; }
+body.menu-open .nav > :nth-child(5) { transition-delay: .21s; } body.menu-open .nav > :nth-child(6) { transition-delay: .25s; } body.menu-open .nav > :nth-child(7) { transition-delay: .29s; } body.menu-open .nav > :nth-child(8) { transition-delay: .33s; }
 .menubtn svg path { transition: transform .35s ease; transform-origin: 12px 12px; }
 .nav a { font: 400 28px/1.2 var(--display); color: var(--ink); text-decoration: none; padding: 13px 0; border-bottom: 1px solid var(--line); text-align: left; }
 .nav a:hover { color: var(--accent); }
@@ -271,6 +271,20 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .band { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: clamp(22px, 4vw, 40px); display: grid; gap: 14px; }
 .band h2 { font-size: clamp(30px, 4vw, 44px); }
 .band p { color: var(--muted); max-width: 54ch; }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding-bottom: 32px; }
+@media (max-width: 760px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile { display: grid; gap: 6px; align-content: start; padding: 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); text-decoration: none; color: var(--ink); }
+.tile:hover { border-color: var(--btn); }
+.tile b { font: 400 30px/1 var(--display); color: var(--accent); }
+.tile span { font-size: 13.5px; color: var(--muted); }
+.policy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 12px 40px; scroll-margin-top: 70px; }
+.policy h2 { font-size: clamp(28px, 3.6vw, 40px); }
+.ptext { display: grid; gap: 12px; max-width: 64ch; }
+.ptext p, .ptext li { color: var(--muted); }
+.ptext b { color: var(--ink); font-weight: 600; }
+.ptext ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.ptext a, .faq a, .note a { color: var(--accent); }
+@media (max-width: 760px) { .policy { grid-template-columns: 1fr; } }
 .flinks { display: flex; flex-wrap: wrap; gap: 6px 16px; }
 .flinks a { color: inherit; }
 .sec > header { display: flex; justify-content: space-between; align-items: end; gap: 12px 24px; flex-wrap: wrap; margin-bottom: 28px; }
@@ -392,6 +406,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
       <a href="#constructor" data-nav="constructor">Конструктор<span class="navcount" hidden></span></a>
       <a href="#bracelets" data-nav="bracelets">Готові браслети</a>
       <a href="#stones" data-nav="stones">Камені</a>
+      <a href="#buyers" data-nav="buyers">Покупцям</a>
       <a href="#info" data-nav="info">Допомога</a>
       <a href="#cart" data-nav="cart">Кошик<span class="navcount" hidden></span></a>
       <button class="themerow" id="theme" type="button" aria-label="Темна тема"><span id="themeicon"></span></button>
@@ -557,6 +572,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
         <div class="field"><label for="f-note">Коментар</label><textarea id="f-note" placeholder="Наприклад: хочу місячний камінь з сильнішим сяйвом"></textarea></div>
         <p class="err" id="f-err" role="alert"></p>
         <div class="row"><button class="cta" type="submit" id="f-submit">Сформувати замовлення</button><a class="cta ghost" href="#constructor">Зібрати ще один браслет</a></div>
+        <p class="note"><a href="#buyers">Доставка, оплата, обмін і повернення</a></p>
         <p class="note" id="f-note-send">Форма складає текст замовлення, який ви надсилаєте нам у Direct в <a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener">Instagram</a>.</p>
       </form>
       <div class="recap" id="recap">
@@ -600,6 +616,79 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   </section>
   </div>
 
+  <div class="view" data-view="buyers" hidden>
+    <section class="wrap pagehead">
+      <p class="label">Покупцям</p>
+      <h1>Доставка, оплата і повернення</h1>
+      <p>Усе, що варто знати перед замовленням.</p>
+    </section>
+    <section class="wrap">
+      <div class="tiles">
+        <a class="tile" href="#making"><b>2 дні</b><span>виготовлення після підтвердження</span></a>
+        <a class="tile" href="#delivery"><b>1–3 дні</b><span>доставка Новою Поштою по Україні</span></a>
+        <a class="tile" href="#payment"><b>3 способи</b><span>оплати на вибір</span></a>
+        <a class="tile" href="#returns"><b>14 днів</b><span>на обмін розміру</span></a>
+      </div>
+    </section>
+    <section id="making" class="wrap sec policy">
+      <h2>Виготовлення</h2>
+      <div class="ptext">
+        <p>Після замовлення майстер підбирає камені наживо й надсилає вам фото саме ваших бусин. Натуральні камені відрізняються відтінком і малюнком, тож ви бачите браслет до того, як ми його зберемо.</p>
+        <p>Щойно ви підтвердите фото, збираємо браслет за <b>2 робочі дні</b>. Для великих замовлень (від 5 браслетів) строк може бути довшим, про це попередимо заздалегідь.</p>
+      </div>
+    </section>
+    <section id="delivery" class="wrap sec policy">
+      <h2>Доставка</h2>
+      <div class="ptext">
+        <ul>
+          <li><b>Нова Пошта</b>, відділення або поштомат: 1–3 дні.</li>
+          <li><b>Укрпошта</b>: 3–5 днів.</li>
+        </ul>
+        <p>Вартість доставки рахує перевізник за своїми тарифами, її сплачує отримувач у відділенні. Номер накладної надсилаємо одразу після відправлення.</p>
+        <p>Кожен браслет пакуємо в мішечок. За бажанням додаємо подарункову коробку з карткою значень каменів (+70 грн, обирається в конструкторі).</p>
+      </div>
+    </section>
+    <section id="payment" class="wrap sec policy">
+      <h2>Оплата</h2>
+      <div class="ptext">
+        <ul>
+          <li><b>Накладений платіж:</b> оплата при отриманні на пошті. Пошта бере комісію за грошовий переказ за своїми тарифами.</li>
+          <li><b>Передоплата 200 грн:</b> решту суми сплачуєте при отриманні.</li>
+          <li><b>Повна оплата</b> на рахунок ФОП: без комісії пошти за переказ.</li>
+        </ul>
+        <p>Спосіб оплати обираєте в кошику під час оформлення замовлення.</p>
+      </div>
+    </section>
+    <section id="returns" class="wrap sec policy">
+      <h2>Обмін і повернення</h2>
+      <div class="ptext">
+        <ul>
+          <li><b>Не підійшов розмір?</b> Протягом 14 днів після отримання перезберемо браслет під новий розмір. Оплачуєте лише доставку.</li>
+          <li><b>Брак або пошкодження під час доставки:</b> замінимо браслет безкоштовно. Будь ласка, оглядайте посилку у відділенні.</li>
+          <li><b>Браслети, зібрані за вашим дизайном,</b> виготовляються індивідуально, тому поверненню без браку не підлягають. Готові браслети з розділу «Готові браслети» можна повернути протягом 14 днів, якщо їх не носили.</li>
+        </ul>
+        <p>Щоб оформити обмін чи повернення, напишіть нам в <a href="https://ig.me/m/air_chains" target="_blank" rel="noopener">Instagram Direct</a>: імʼя, телефон із замовлення і фото браслета.</p>
+      </div>
+    </section>
+    <section id="care" class="wrap sec policy">
+      <h2>Гарантія і догляд</h2>
+      <div class="ptext">
+        <p>Збираємо браслети на міцну еластичну нитку з подвійним вузлом. Якщо нитка порветься протягом 30 днів, перезберемо браслет безкоштовно.</p>
+        <ul>
+          <li>Знімайте браслет перед душем, басейном і спортом.</li>
+          <li>Не розтягуйте нитку надто сильно, надягаючи браслет.</li>
+          <li>Малахіт і говліт мʼякі (3,5–4 за шкалою Мооса): бережіть їх від ударів, парфумів і кремів.</li>
+        </ul>
+      </div>
+    </section>
+    <section id="contacts" class="wrap sec policy">
+      <h2>Звʼязок</h2>
+      <div class="ptext">
+        <p>Відповідаємо в <a href="https://ig.me/m/air_chains" target="_blank" rel="noopener">Instagram Direct @air_chains</a>, зазвичай протягом дня.</p>
+      </div>
+    </section>
+  </div>
+
   <div class="view" data-view="info" hidden>
     <section class="wrap pagehead">
       <p class="label">Допомога</p>
@@ -621,9 +710,9 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
     <header><h2>Питання</h2></header>
     <div class="faq">
       <details><summary>Камені справді натуральні?</summary><p>Так. Тому відтінок і малюнок кожної бусини трохи відрізняються від зображення в конструкторі. Перед збиранням ми надсилаємо фото підібраних каменів.</p></details>
-      <details><summary>Що робити, якщо браслет не підійде за розміром?</summary><p>Протягом 14 днів перезберемо його під новий розмір. Оплачуєте лише доставку.</p></details>
+      <details><summary>Що робити, якщо браслет не підійде за розміром?</summary><p>Протягом 14 днів перезберемо його під новий розмір. Оплачуєте лише доставку. Усі умови обміну й повернення є в розділі <a href="#buyers">«Покупцям»</a>.</p></details>
       <details><summary>Як доглядати за браслетом?</summary><p>Знімайте перед душем, басейном і спортом. Малахіт і говліт мʼякі (3,5–4 за шкалою Мооса), тож бережіть їх від ударів, парфумів і кремів.</p></details>
-      <details><summary>Можна поєднати бусини різних розмірів?</summary><p>Конструктор збирає браслет з одного розміру бусин. Якщо хочете змішати розміри, напишіть про це в коментарі до замовлення.</p></details>
+      <details><summary>Можна поєднати бусини різних розмірів?</summary><p>Так. У конструкторі перед тим, як додати камінь, оберіть 6, 8 або 10 мм. Так в одному браслеті можна поєднати різні розміри.</p></details>
     </div>
   </section>
   </div>
@@ -636,7 +725,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 </main>
 
 <footer>
-  <div class="wrap"><span>Air Chains · браслети з натурального каміння</span><span class="flinks"><a href="#constructor">Конструктор</a><a href="#bracelets">Готові браслети</a><a href="#stones">Камені</a><a href="#info">Допомога</a></span><a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" style="color:inherit">Instagram</a></div>
+  <div class="wrap"><span>Air Chains · браслети з натурального каміння</span><span class="flinks"><a href="#constructor">Конструктор</a><a href="#bracelets">Готові браслети</a><a href="#stones">Камені</a><a href="#buyers">Покупцям</a><a href="#info">Допомога</a></span><a href="https://www.instagram.com/air_chains/" target="_blank" rel="noopener" style="color:inherit">Instagram</a></div>
 </footer>
 
 <nav class="tabbar" id="tabbar" role="tablist" aria-label="Кроки конструктора">
@@ -1866,7 +1955,7 @@ $('#homeStones').replaceChildren(...STONES.slice(0, 8).map(s => el('a', { classN
 })();
 
 /* ---------- sections: #home, #constructor, #bracelets, #stones, #info ---------- */
-const VIEWS = ['home', 'constructor', 'bracelets', 'stones', 'info', 'cart'];
+const VIEWS = ['home', 'constructor', 'bracelets', 'stones', 'buyers', 'info', 'cart'];
 function route() {
   if (location.hash === '#paid') {
     setPending(null);
